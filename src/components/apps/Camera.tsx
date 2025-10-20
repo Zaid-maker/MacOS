@@ -4,7 +4,8 @@ import { Camera as CameraIcon, Square, RotateCw, Download, Trash2, X } from 'luc
 interface CapturedPhoto {
   id: string;
   dataUrl: string;
-  timestamp: Date;
+  timestamp: number;
+  favorite?: boolean;
 }
 
 export const Camera: React.FC = () => {
@@ -18,6 +19,19 @@ export const Camera: React.FC = () => {
   const [error, setError] = useState<string>('');
   const [isCapturing, setIsCapturing] = useState(false);
   const [hasPermission, setHasPermission] = useState(false);
+
+  // Load photos from localStorage on mount
+  useEffect(() => {
+    try {
+      const savedPhotos = localStorage.getItem('cameraPhotos');
+      if (savedPhotos) {
+        const parsedPhotos = JSON.parse(savedPhotos);
+        setCapturedPhotos(parsedPhotos);
+      }
+    } catch (error) {
+      console.error('Error loading photos from localStorage:', error);
+    }
+  }, []);
 
   // Get available cameras
   useEffect(() => {
@@ -113,10 +127,20 @@ export const Camera: React.FC = () => {
     const newPhoto: CapturedPhoto = {
       id: Date.now().toString(),
       dataUrl,
-      timestamp: new Date(),
+      timestamp: Date.now(),
     };
 
-    setCapturedPhotos(prev => [newPhoto, ...prev]);
+    const updatedPhotos = [newPhoto, ...capturedPhotos];
+    setCapturedPhotos(updatedPhotos);
+    
+    // Save to localStorage
+    try {
+      localStorage.setItem('cameraPhotos', JSON.stringify(updatedPhotos));
+      // Dispatch custom event to notify Photos app
+      window.dispatchEvent(new Event('photosCaptured'));
+    } catch (error) {
+      console.error('Error saving photo to localStorage:', error);
+    }
     
     // Capture animation
     setIsCapturing(true);
@@ -138,13 +162,23 @@ export const Camera: React.FC = () => {
   const downloadPhoto = (photo: CapturedPhoto) => {
     const link = document.createElement('a');
     link.href = photo.dataUrl;
-    link.download = `photo-${photo.timestamp.getTime()}.jpg`;
+    link.download = `photo-${photo.timestamp}.jpg`;
     link.click();
   };
 
   // Delete photo
   const deletePhoto = (photoId: string) => {
-    setCapturedPhotos(prev => prev.filter(p => p.id !== photoId));
+    const updatedPhotos = capturedPhotos.filter(p => p.id !== photoId);
+    setCapturedPhotos(updatedPhotos);
+    
+    // Update localStorage
+    try {
+      localStorage.setItem('cameraPhotos', JSON.stringify(updatedPhotos));
+      window.dispatchEvent(new Event('photosCaptured'));
+    } catch (error) {
+      console.error('Error updating localStorage:', error);
+    }
+    
     if (selectedPhoto?.id === photoId) {
       setSelectedPhoto(null);
     }

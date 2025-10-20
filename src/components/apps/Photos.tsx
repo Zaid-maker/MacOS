@@ -39,7 +39,14 @@ export const Photos: React.FC = () => {
       const savedPhotos = localStorage.getItem('cameraPhotos');
       if (savedPhotos) {
         const parsedPhotos = JSON.parse(savedPhotos);
-        setPhotos(parsedPhotos);
+        // Convert timestamp to number if it's a Date string
+        const normalizedPhotos = parsedPhotos.map((photo: any) => ({
+          ...photo,
+          timestamp: typeof photo.timestamp === 'string' 
+            ? new Date(photo.timestamp).getTime() 
+            : photo.timestamp
+        }));
+        setPhotos(normalizedPhotos);
       }
     } catch (error) {
       console.error('Error loading photos:', error);
