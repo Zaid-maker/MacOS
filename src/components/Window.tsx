@@ -15,6 +15,7 @@ export const Window: React.FC<WindowProps> = React.memo(({ window, children }) =
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [resizeStart, setResizeStart] = useState({ x: 0, y: 0, width: 0, height: 0 });
   const [showControlIcons, setShowControlIcons] = useState(false);
+  const [hasControlFocus, setHasControlFocus] = useState(false);
   const animationFrameRef = useRef<number | undefined>(undefined);
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
@@ -108,6 +109,7 @@ export const Window: React.FC<WindowProps> = React.memo(({ window, children }) =
       onClick={() => focusWindow(window.id)}
       onMouseEnter={() => setShowControlIcons(true)}
       onMouseLeave={() => setShowControlIcons(false)}
+      onTouchStart={() => setShowControlIcons(true)}
     >
       <div className="window-titlebar" onMouseDown={handleMouseDown}>
         <div className="window-controls">
@@ -117,9 +119,11 @@ export const Window: React.FC<WindowProps> = React.memo(({ window, children }) =
               e.stopPropagation();
               closeWindow(window.id);
             }}
+            onFocus={() => setHasControlFocus(true)}
+            onBlur={() => setHasControlFocus(false)}
             title="Close"
           >
-            {showControlIcons && <span className="control-icon">✕</span>}
+            {(showControlIcons || hasControlFocus) && <span className="control-icon">✕</span>}
           </button>
           <button
             className="window-control minimize"
@@ -127,9 +131,11 @@ export const Window: React.FC<WindowProps> = React.memo(({ window, children }) =
               e.stopPropagation();
               minimizeWindow(window.id);
             }}
+            onFocus={() => setHasControlFocus(true)}
+            onBlur={() => setHasControlFocus(false)}
             title="Minimize"
           >
-            {showControlIcons && <span className="control-icon">−</span>}
+            {(showControlIcons || hasControlFocus) && <span className="control-icon">−</span>}
           </button>
           <button
             className="window-control maximize"
@@ -137,9 +143,11 @@ export const Window: React.FC<WindowProps> = React.memo(({ window, children }) =
               e.stopPropagation();
               maximizeWindow(window.id);
             }}
+            onFocus={() => setHasControlFocus(true)}
+            onBlur={() => setHasControlFocus(false)}
             title="Maximize"
           >
-            {showControlIcons && <span className="control-icon">⤢</span>}
+            {(showControlIcons || hasControlFocus) && <span className="control-icon">⤢</span>}
           </button>
         </div>
         <div className="window-title">{window.title}</div>
