@@ -90,7 +90,7 @@ function OSContent() {
   );
 }
 
-function App() {
+export default function App() {
   const [isBooting, setIsBooting] = useState(true);
   const [showContent, setShowContent] = useState(false);
 
@@ -127,5 +127,3 @@ function App() {
     </>
   );
 }
-
-export default App;
