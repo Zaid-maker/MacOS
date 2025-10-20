@@ -1736,7 +1736,7 @@ body {
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.95);
-  z-index: 1000;
+  z-index: 10001;
   display: flex;
   align-items: center;
   justify-content: center;

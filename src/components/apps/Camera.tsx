@@ -130,17 +130,20 @@ export const Camera: React.FC = () => {
       timestamp: Date.now(),
     };
 
-    const updatedPhotos = [newPhoto, ...capturedPhotos];
-    setCapturedPhotos(updatedPhotos);
-    
-    // Save to localStorage
-    try {
-      localStorage.setItem('cameraPhotos', JSON.stringify(updatedPhotos));
-      // Dispatch custom event to notify Photos app
-      window.dispatchEvent(new Event('photosCaptured'));
-    } catch (error) {
-      console.error('Error saving photo to localStorage:', error);
-    }
+    setCapturedPhotos(prev => {
+      const updatedPhotos = [newPhoto, ...prev];
+      
+      // Save to localStorage
+      try {
+        localStorage.setItem('cameraPhotos', JSON.stringify(updatedPhotos));
+        // Dispatch custom event to notify Photos app
+        window.dispatchEvent(new Event('photosCaptured'));
+      } catch (error) {
+        console.error('Error saving photo to localStorage:', error);
+      }
+      
+      return updatedPhotos;
+    });
     
     // Capture animation
     setIsCapturing(true);
@@ -168,16 +171,19 @@ export const Camera: React.FC = () => {
 
   // Delete photo
   const deletePhoto = (photoId: string) => {
-    const updatedPhotos = capturedPhotos.filter(p => p.id !== photoId);
-    setCapturedPhotos(updatedPhotos);
-    
-    // Update localStorage
-    try {
-      localStorage.setItem('cameraPhotos', JSON.stringify(updatedPhotos));
-      window.dispatchEvent(new Event('photosCaptured'));
-    } catch (error) {
-      console.error('Error updating localStorage:', error);
-    }
+    setCapturedPhotos(prev => {
+      const updatedPhotos = prev.filter(p => p.id !== photoId);
+      
+      // Update localStorage
+      try {
+        localStorage.setItem('cameraPhotos', JSON.stringify(updatedPhotos));
+        window.dispatchEvent(new Event('photosCaptured'));
+      } catch (error) {
+        console.error('Error updating localStorage:', error);
+      }
+      
+      return updatedPhotos;
+    });
     
     if (selectedPhoto?.id === photoId) {
       setSelectedPhoto(null);

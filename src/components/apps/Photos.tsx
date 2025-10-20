@@ -56,7 +56,7 @@ export const Photos: React.FC = () => {
   const handleDownload = (photo: Photo) => {
     const link = document.createElement('a');
     link.href = photo.dataUrl;
-    link.download = `photo-${new Date(photo.timestamp).toISOString()}.png`;
+    link.download = `photo-${new Date(photo.timestamp).toISOString()}.jpg`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
