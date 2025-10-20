@@ -26,10 +26,17 @@ export const Camera: React.FC = () => {
       const savedPhotos = localStorage.getItem('cameraPhotos');
       if (savedPhotos) {
         const parsedPhotos = JSON.parse(savedPhotos);
-        setCapturedPhotos(parsedPhotos);
+        // Validate that parsed data is an array before setting state
+        if (Array.isArray(parsedPhotos)) {
+          setCapturedPhotos(parsedPhotos);
+        } else {
+          console.warn('Invalid photos data in localStorage, expected array');
+          setCapturedPhotos([]);
+        }
       }
     } catch (error) {
       console.error('Error loading photos from localStorage:', error);
+      setCapturedPhotos([]);
     }
   }, []);
 

@@ -1546,6 +1546,12 @@ body {
   color: #1d1d1f;
 }
 
+.photos-search input:focus {
+  outline: 2px solid #5e5ce6;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 .photos-search input::placeholder {
   color: #86868b;
 }
@@ -4217,6 +4223,10 @@ body {
 
 .dark-mode .photos-search input {
   color: #e5e5e7;
+}
+
+.dark-mode .photos-search input:focus {
+  outline: 2px solid #5e5ce6;
 }
 
 .dark-mode .photos-search input::placeholder {

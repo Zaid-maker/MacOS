@@ -39,17 +39,27 @@ export const Photos: React.FC = () => {
       const savedPhotos = localStorage.getItem('cameraPhotos');
       if (savedPhotos) {
         const parsedPhotos = JSON.parse(savedPhotos);
-        // Convert timestamp to number if it's a Date string
-        const normalizedPhotos = parsedPhotos.map((photo: any) => ({
-          ...photo,
-          timestamp: typeof photo.timestamp === 'string' 
-            ? new Date(photo.timestamp).getTime() 
-            : photo.timestamp
-        }));
-        setPhotos(normalizedPhotos);
+        // Validate that parsed data is an array
+        if (Array.isArray(parsedPhotos)) {
+          // Convert timestamp to number if it's a Date string
+          const normalizedPhotos = parsedPhotos.map((photo: any) => ({
+            ...photo,
+            timestamp: typeof photo.timestamp === 'string' 
+              ? new Date(photo.timestamp).getTime() 
+              : photo.timestamp
+          }));
+          setPhotos(normalizedPhotos);
+        } else {
+          console.warn('Invalid photos data in localStorage, expected array');
+          setPhotos([]);
+        }
+      } else {
+        // Clear photos when localStorage is empty (data was deleted)
+        setPhotos([]);
       }
     } catch (error) {
       console.error('Error loading photos:', error);
+      setPhotos([]);
     }
   };
 
