@@ -2473,6 +2473,172 @@ body {
   border-color: rgba(255, 255, 255, 0.3);
 }
 
+/* Boot Animation */
+.boot-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #000000;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: bootFadeIn 0.5s ease-out;
+}
+
+.boot-screen.power-chime {
+  background: #0a0a0a;
+  animation: powerChime 0.3s ease-out;
+}
+
+.boot-screen.fade-out {
+  animation: bootFadeOut 0.5s ease-out forwards;
+}
+
+.boot-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+}
+
+.boot-logo {
+  color: #ffffff;
+  animation: logoGlow 2s ease-in-out;
+  transition: transform 0.5s ease-out;
+}
+
+.boot-logo.logo-shrink {
+  transform: scale(0.6);
+}
+
+.boot-logo svg {
+  filter: drop-shadow(0 0 30px rgba(255, 255, 255, 0.3));
+}
+
+.boot-progress-container {
+  animation: progressFadeIn 0.4s ease-out;
+}
+
+.boot-progress-track {
+  width: 200px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+
+.boot-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, 
+    rgba(255, 255, 255, 0.6) 0%, 
+    rgba(255, 255, 255, 0.9) 50%, 
+    rgba(255, 255, 255, 0.6) 100%
+  );
+  border-radius: 2px;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    0 0 10px rgba(255, 255, 255, 0.4),
+    0 0 20px rgba(255, 255, 255, 0.2);
+  position: relative;
+  animation: progressShimmer 1.5s ease-in-out infinite;
+}
+
+.boot-text {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  animation: textFadeIn 0.6s ease-out;
+}
+
+.boot-version {
+  position: fixed;
+  bottom: 40px;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  animation: textFadeIn 0.8s ease-out;
+}
+
+@keyframes powerChime {
+  0% {
+    background: #ffffff;
+  }
+  100% {
+    background: #0a0a0a;
+  }
+}
+
+@keyframes bootFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes bootFadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes logoGlow {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+    filter: drop-shadow(0 0 0px rgba(255, 255, 255, 0));
+  }
+  50% {
+    opacity: 1;
+    filter: drop-shadow(0 0 40px rgba(255, 255, 255, 0.5));
+  }
+  100% {
+    opacity: 1;
+    filter: drop-shadow(0 0 30px rgba(255, 255, 255, 0.3));
+  }
+}
+
+@keyframes progressFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes progressShimmer {
+  0%, 100% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes textFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 
 
 

@@ -17,6 +17,7 @@ import { Spotlight } from './components/Spotlight';
 import { KeyboardShortcutsOverlay } from './components/KeyboardShortcutsOverlay';
 import { NotificationToast } from './components/NotificationToast';
 import { MissionControl } from './components/MissionControl';
+import { BootAnimation } from './components/BootAnimation';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import type { App, DesktopIcon } from './types';
 import './App.css';
@@ -90,26 +91,40 @@ function OSContent() {
 }
 
 function App() {
+  const [isBooting, setIsBooting] = useState(true);
+  const [showContent, setShowContent] = useState(false);
+
+  const handleBootComplete = () => {
+    setIsBooting(false);
+    // Small delay before showing content for smooth transition
+    setTimeout(() => setShowContent(true), 100);
+  };
+
   return (
-    <ThemeProvider>
-      <WallpaperProvider>
-        <SoundProvider>
-          <NotificationProvider>
-            <ContextMenuProvider>
-              <DragDropProvider>
-                <SpacesProvider>
-                  <AuthProvider>
-                    <OSProvider>
-                      <OSContent />
-                    </OSProvider>
-                  </AuthProvider>
-                </SpacesProvider>
-              </DragDropProvider>
-            </ContextMenuProvider>
-          </NotificationProvider>
-        </SoundProvider>
-      </WallpaperProvider>
-    </ThemeProvider>
+    <>
+      {isBooting && <BootAnimation onComplete={handleBootComplete} />}
+      {showContent && (
+        <ThemeProvider>
+          <WallpaperProvider>
+            <SoundProvider>
+              <NotificationProvider>
+                <ContextMenuProvider>
+                  <DragDropProvider>
+                    <SpacesProvider>
+                      <AuthProvider>
+                        <OSProvider>
+                          <OSContent />
+                        </OSProvider>
+                      </AuthProvider>
+                    </SpacesProvider>
+                  </DragDropProvider>
+                </ContextMenuProvider>
+              </NotificationProvider>
+            </SoundProvider>
+          </WallpaperProvider>
+        </ThemeProvider>
+      )}
+    </>
   );
 }
 
