@@ -1,5 +1,4 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
-import { X, Minus, Maximize2 } from 'lucide-react';
 import { useOS } from '../contexts/OSContext';
 import type { AppWindow } from '../types';
 
@@ -15,6 +14,7 @@ export const Window: React.FC<WindowProps> = React.memo(({ window, children }) =
   const [isResizing, setIsResizing] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [resizeStart, setResizeStart] = useState({ x: 0, y: 0, width: 0, height: 0 });
+  const [showControlIcons, setShowControlIcons] = useState(false);
   const animationFrameRef = useRef<number | undefined>(undefined);
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
@@ -106,6 +106,8 @@ export const Window: React.FC<WindowProps> = React.memo(({ window, children }) =
       className={`window ${window.isFocused ? 'focused' : ''}`}
       style={style}
       onClick={() => focusWindow(window.id)}
+      onMouseEnter={() => setShowControlIcons(true)}
+      onMouseLeave={() => setShowControlIcons(false)}
     >
       <div className="window-titlebar" onMouseDown={handleMouseDown}>
         <div className="window-controls">
@@ -115,8 +117,9 @@ export const Window: React.FC<WindowProps> = React.memo(({ window, children }) =
               e.stopPropagation();
               closeWindow(window.id);
             }}
+            title="Close"
           >
-            <X size={10} />
+            {showControlIcons && <span className="control-icon">✕</span>}
           </button>
           <button
             className="window-control minimize"
@@ -124,8 +127,9 @@ export const Window: React.FC<WindowProps> = React.memo(({ window, children }) =
               e.stopPropagation();
               minimizeWindow(window.id);
             }}
+            title="Minimize"
           >
-            <Minus size={10} />
+            {showControlIcons && <span className="control-icon">−</span>}
           </button>
           <button
             className="window-control maximize"
@@ -133,8 +137,9 @@ export const Window: React.FC<WindowProps> = React.memo(({ window, children }) =
               e.stopPropagation();
               maximizeWindow(window.id);
             }}
+            title="Maximize"
           >
-            <Maximize2 size={10} />
+            {showControlIcons && <span className="control-icon">⤢</span>}
           </button>
         </div>
         <div className="window-title">{window.title}</div>
