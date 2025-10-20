@@ -18,6 +18,7 @@ import { KeyboardShortcutsOverlay } from './components/KeyboardShortcutsOverlay'
 import { NotificationToast } from './components/NotificationToast';
 import { MissionControl } from './components/MissionControl';
 import { BootAnimation } from './components/BootAnimation';
+import { ControlCenter } from './components/ControlCenter';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import type { App, DesktopIcon } from './types';
 import './App.css';
@@ -54,6 +55,7 @@ function OSContent() {
   const { currentWallpaper } = useWallpaper();
   const { toggleMissionControl } = useSpaces();
   const [isSpotlightOpen, setIsSpotlightOpen] = useState(false);
+  const [isControlCenterOpen, setIsControlCenterOpen] = useState(false);
 
   useKeyboardShortcuts({
     onSpotlight: () => setIsSpotlightOpen(true),
@@ -70,7 +72,10 @@ function OSContent() {
 
   return (
     <div className={`macos ${isDarkMode ? 'dark-mode' : ''}`} style={{ background: currentWallpaper.gradient }}>
-      <MenuBar onSpotlightOpen={() => setIsSpotlightOpen(true)} />
+      <MenuBar 
+        onSpotlightOpen={() => setIsSpotlightOpen(true)}
+        onControlCenterToggle={() => setIsControlCenterOpen(!isControlCenterOpen)}
+      />
       <Desktop icons={desktopIcons} />
       {windows.map(window => {
         const app = contextApps.find(a => a.id === window.appId);
@@ -85,6 +90,7 @@ function OSContent() {
       })}
       <Dock apps={contextApps} />
       <Spotlight isOpen={isSpotlightOpen} onClose={() => setIsSpotlightOpen(false)} />
+      <ControlCenter isOpen={isControlCenterOpen} onClose={() => setIsControlCenterOpen(false)} />
       <KeyboardShortcutsOverlay />
       <NotificationToast />
       <MissionControl />

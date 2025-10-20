@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Apple, Wifi, Battery, Volume2, VolumeX, Search, LogOut, Moon, Sun, Grid3x3 } from 'lucide-react';
+import { Apple, Wifi, Battery, Volume2, VolumeX, Search, LogOut, Moon, Sun, Grid3x3, SlidersHorizontal } from 'lucide-react';
 import { useOS } from '../contexts/OSContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
@@ -8,9 +8,10 @@ import { useSpaces } from '../contexts/SpacesContext';
 
 interface MenuBarProps {
   onSpotlightOpen: () => void;
+  onControlCenterToggle: () => void;
 }
 
-export const MenuBar: React.FC<MenuBarProps> = React.memo(({ onSpotlightOpen }) => {
+export const MenuBar: React.FC<MenuBarProps> = React.memo(({ onSpotlightOpen, onControlCenterToggle }) => {
   const { activeApp, apps } = useOS();
   const { logout, currentUser } = useAuth();
   const { isDarkMode, toggleDarkMode } = useTheme();
@@ -103,6 +104,9 @@ export const MenuBar: React.FC<MenuBarProps> = React.memo(({ onSpotlightOpen }) 
         </div>
         <div className="menu-item">
           <Wifi size={16} />
+        </div>
+        <div className="menu-item" onClick={onControlCenterToggle} title="Control Center">
+          <SlidersHorizontal size={16} />
         </div>
         <div className="menu-item" onClick={toggleMissionControl} title="Mission Control (⌃↑ or F3)">
           <Grid3x3 size={16} />
