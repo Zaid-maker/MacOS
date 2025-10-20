@@ -10,7 +10,7 @@ interface CapturedPhoto {
 export const Camera: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [stream, setStream] = useState<MediaStream | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
   const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
   const [currentDeviceId, setCurrentDeviceId] = useState<string>('');
   const [capturedPhotos, setCapturedPhotos] = useState<CapturedPhoto[]>([]);
@@ -44,8 +44,8 @@ export const Camera: React.FC = () => {
       setError('');
       
       // Stop existing stream if any
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop());
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
       }
 
       const constraints: MediaStreamConstraints = {
@@ -54,7 +54,7 @@ export const Camera: React.FC = () => {
       };
 
       const mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
-      setStream(mediaStream);
+      streamRef.current = mediaStream;
       setHasPermission(true);
 
       if (videoRef.current) {
@@ -81,8 +81,10 @@ export const Camera: React.FC = () => {
     startCamera(currentDeviceId);
 
     return () => {
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop());
+      // Cleanup: stop the camera stream when component unmounts
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+        streamRef.current = null;
       }
     };
   }, [currentDeviceId]);
