@@ -110,6 +110,30 @@ export const Camera: React.FC = () => {
     };
   }, [currentDeviceId]);
 
+  // Helper function to safely read photos from localStorage
+  const getStoredPhotos = (): CapturedPhoto[] => {
+    try {
+      const savedPhotos = localStorage.getItem('cameraPhotos');
+      if (savedPhotos) {
+        const parsed = JSON.parse(savedPhotos);
+        return Array.isArray(parsed) ? parsed : [];
+      }
+    } catch (error) {
+      console.error('Error reading photos from localStorage:', error);
+    }
+    return [];
+  };
+
+  // Helper function to safely write photos to localStorage
+  const setStoredPhotos = (photos: CapturedPhoto[]) => {
+    try {
+      localStorage.setItem('cameraPhotos', JSON.stringify(photos));
+      window.dispatchEvent(new Event('photosCaptured'));
+    } catch (error) {
+      console.error('Error saving photos to localStorage:', error);
+    }
+  };
+
   // Capture photo
   const capturePhoto = () => {
     if (!videoRef.current || !canvasRef.current) return;
@@ -137,20 +161,15 @@ export const Camera: React.FC = () => {
       timestamp: Date.now(),
     };
 
-    setCapturedPhotos(prev => {
-      const updatedPhotos = [newPhoto, ...prev];
-      
-      // Save to localStorage
-      try {
-        localStorage.setItem('cameraPhotos', JSON.stringify(updatedPhotos));
-        // Dispatch custom event to notify Photos app
-        window.dispatchEvent(new Event('photosCaptured'));
-      } catch (error) {
-        console.error('Error saving photo to localStorage:', error);
-      }
-      
-      return updatedPhotos;
-    });
+    // Read latest photos from localStorage (may include changes from Photos app)
+    const latestPhotos = getStoredPhotos();
+    const updatedPhotos = [newPhoto, ...latestPhotos];
+    
+    // Save to localStorage
+    setStoredPhotos(updatedPhotos);
+    
+    // Update component state
+    setCapturedPhotos(updatedPhotos);
     
     // Capture animation
     setIsCapturing(true);
@@ -178,19 +197,15 @@ export const Camera: React.FC = () => {
 
   // Delete photo
   const deletePhoto = (photoId: string) => {
-    setCapturedPhotos(prev => {
-      const updatedPhotos = prev.filter(p => p.id !== photoId);
-      
-      // Update localStorage
-      try {
-        localStorage.setItem('cameraPhotos', JSON.stringify(updatedPhotos));
-        window.dispatchEvent(new Event('photosCaptured'));
-      } catch (error) {
-        console.error('Error updating localStorage:', error);
-      }
-      
-      return updatedPhotos;
-    });
+    // Read latest photos from localStorage (may include changes from Photos app)
+    const latestPhotos = getStoredPhotos();
+    const updatedPhotos = latestPhotos.filter(p => p.id !== photoId);
+    
+    // Save to localStorage
+    setStoredPhotos(updatedPhotos);
+    
+    // Update component state
+    setCapturedPhotos(updatedPhotos);
     
     if (selectedPhoto?.id === photoId) {
       setSelectedPhoto(null);
