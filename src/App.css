@@ -2639,6 +2639,206 @@ body {
   }
 }
 
+/* Enhanced Calculator Styles */
+.calculator-header {
+  display: flex;
+  gap: 8px;
+  padding: 10px;
+  background: #1c1c1e;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.calc-mode-btn {
+  flex: 1;
+  padding: 8px;
+  background: #2c2c2e;
+  color: rgba(255, 255, 255, 0.6);
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.calc-mode-btn.active {
+  background: #0a84ff;
+  color: white;
+}
+
+.calculator-display {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: 5px;
+}
+
+.calculator-memory {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.5);
+  height: 20px;
+}
+
+.calculator-main-display {
+  font-size: 64px;
+  font-weight: 300;
+}
+
+.calculator-history {
+  background: #1c1c1e;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 14px;
+  text-align: right;
+  padding: 5px 20px;
+  height: 30px;
+}
+
+.calculator-buttons.scientific {
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.calculator-buttons.scientific .calc-btn {
+  font-size: 16px;
+  aspect-ratio: auto;
+  padding: 15px 10px;
+  border-radius: 12px;
+}
+
+/* Enhanced Notes Styles */
+.notes-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 15px;
+  background: rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.notes-search svg {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.notes-search-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 13px;
+  color: #333;
+}
+
+.notes-search-input::placeholder {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.notes-editor-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.notes-export-btn {
+  background: #0066ff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: background 0.15s;
+}
+
+.notes-export-btn:hover {
+  background: #0055dd;
+}
+
+.notes-toolbar {
+  display: flex;
+  gap: 5px;
+  padding: 10px 15px;
+  background: #f5f5f7;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.notes-toolbar button {
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+  padding: 8px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.notes-toolbar button:hover {
+  background: #e8e8ea;
+}
+
+.notes-footer {
+  padding: 10px 15px;
+  background: #f5f5f7;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+/* Enhanced Terminal Styles */
+.terminal-line {
+  font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/* Dark Mode Overrides for Enhanced Features */
+.dark-mode .notes-search {
+  background: rgba(255, 255, 255, 0.05);
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark-mode .notes-search svg {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.dark-mode .notes-search-input {
+  color: white;
+}
+
+.dark-mode .notes-search-input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.dark-mode .notes-toolbar {
+  background: #2c2c2e;
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark-mode .notes-toolbar button {
+  background: #3a3a3c;
+  border-color: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.dark-mode .notes-toolbar button:hover {
+  background: #48484a;
+}
+
+.dark-mode .notes-footer {
+  background: #2c2c2e;
+  border-top-color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.dark-mode .notes-editor-header {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
 
 
 
