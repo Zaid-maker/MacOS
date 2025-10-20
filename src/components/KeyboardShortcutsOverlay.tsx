@@ -28,6 +28,7 @@ export const KeyboardShortcutsOverlay: React.FC = () => {
 
   const shortcuts = [
     { keys: `${cmdKey} Space`, description: 'Open Spotlight Search' },
+    { keys: `${cmdKey} ↑ or F3`, description: 'Open Mission Control' },
     { keys: `${cmdKey} Q`, description: 'Quit/Close focused window' },
     { keys: `${cmdKey} W`, description: 'Close window' },
     { keys: `${cmdKey} M`, description: 'Minimize window' },

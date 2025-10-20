@@ -3,9 +3,10 @@ import { useOS } from '../contexts/OSContext';
 
 interface UseKeyboardShortcutsProps {
   onSpotlight: () => void;
+  onMissionControl?: () => void;
 }
 
-export const useKeyboardShortcuts = ({ onSpotlight }: UseKeyboardShortcutsProps) => {
+export const useKeyboardShortcuts = ({ onSpotlight, onMissionControl }: UseKeyboardShortcutsProps) => {
   const { windows, closeWindow, minimizeWindow, focusWindow } = useOS();
 
   useEffect(() => {
@@ -19,6 +20,17 @@ export const useKeyboardShortcuts = ({ onSpotlight }: UseKeyboardShortcutsProps)
         onSpotlight();
         return;
       }
+
+      // Ctrl/Cmd + Up Arrow OR F3 - Mission Control
+      if ((cmdKey && e.key === 'ArrowUp') || e.key === 'F3') {
+        e.preventDefault();
+        if (onMissionControl) {
+          onMissionControl();
+        }
+        return;
+      }
+
+      // Escape - Close Mission Control (handled in MissionControl component)
 
       // Cmd/Ctrl + Q - Quit app (close focused window)
       if (cmdKey && e.key === 'q') {
@@ -77,5 +89,5 @@ export const useKeyboardShortcuts = ({ onSpotlight }: UseKeyboardShortcutsProps)
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [windows, closeWindow, minimizeWindow, focusWindow, onSpotlight]);
+  }, [windows, closeWindow, minimizeWindow, focusWindow, onSpotlight, onMissionControl]);
 };

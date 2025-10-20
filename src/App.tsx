@@ -7,6 +7,7 @@ import { NotificationProvider } from './contexts/NotificationContext';
 import { ContextMenuProvider } from './contexts/ContextMenuContext';
 import { DragDropProvider } from './contexts/DragDropContext';
 import { SoundProvider } from './contexts/SoundContext';
+import { SpacesProvider, useSpaces } from './contexts/SpacesContext';
 import { MenuBar } from './components/MenuBar';
 import { Dock } from './components/Dock';
 import { Desktop } from './components/Desktop';
@@ -15,6 +16,7 @@ import { LoginPage } from './components/LoginPage';
 import { Spotlight } from './components/Spotlight';
 import { KeyboardShortcutsOverlay } from './components/KeyboardShortcutsOverlay';
 import { NotificationToast } from './components/NotificationToast';
+import { MissionControl } from './components/MissionControl';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import type { App, DesktopIcon } from './types';
 import './App.css';
@@ -47,10 +49,12 @@ function OSContent() {
   const { isAuthenticated } = useAuth();
   const { isDarkMode } = useTheme();
   const { currentWallpaper } = useWallpaper();
+  const { toggleMissionControl } = useSpaces();
   const [isSpotlightOpen, setIsSpotlightOpen] = useState(false);
 
   useKeyboardShortcuts({
     onSpotlight: () => setIsSpotlightOpen(true),
+    onMissionControl: toggleMissionControl,
   });
 
   useEffect(() => {
@@ -80,6 +84,7 @@ function OSContent() {
       <Spotlight isOpen={isSpotlightOpen} onClose={() => setIsSpotlightOpen(false)} />
       <KeyboardShortcutsOverlay />
       <NotificationToast />
+      <MissionControl />
     </div>
   );
 }
@@ -92,11 +97,13 @@ function App() {
           <NotificationProvider>
             <ContextMenuProvider>
               <DragDropProvider>
-                <AuthProvider>
-                  <OSProvider>
-                    <OSContent />
-                  </OSProvider>
-                </AuthProvider>
+                <SpacesProvider>
+                  <AuthProvider>
+                    <OSProvider>
+                      <OSContent />
+                    </OSProvider>
+                  </AuthProvider>
+                </SpacesProvider>
               </DragDropProvider>
             </ContextMenuProvider>
           </NotificationProvider>
