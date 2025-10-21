@@ -1,11 +1,22 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Camera as CameraIcon, Square, RotateCw, Download, Trash2, X } from 'lucide-react';
+import { Camera as CameraIcon, Square, RotateCw, Download, Trash2, X, Settings, RotateCcw } from 'lucide-react';
 
 interface CapturedPhoto {
   id: string;
   dataUrl: string;
   timestamp: number;
   favorite?: boolean;
+}
+
+interface CameraSettings {
+  brightness: number;
+  contrast: number;
+  saturation: number;
+  invert: boolean;
+  grayscale: boolean;
+  sepia: boolean;
+  blur: number;
+  hueRotate: number;
 }
 
 export const Camera: React.FC = () => {
@@ -19,6 +30,17 @@ export const Camera: React.FC = () => {
   const [error, setError] = useState<string>('');
   const [isCapturing, setIsCapturing] = useState(false);
   const [hasPermission, setHasPermission] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [settings, setSettings] = useState<CameraSettings>({
+    brightness: 100,
+    contrast: 100,
+    saturation: 100,
+    invert: false,
+    grayscale: false,
+    sepia: false,
+    blur: 0,
+    hueRotate: 0,
+  });
 
   // Load photos from localStorage on mount
   useEffect(() => {
@@ -134,6 +156,52 @@ export const Camera: React.FC = () => {
     }
   };
 
+  // Apply filters to canvas context
+  const applyFilters = (ctx: CanvasRenderingContext2D) => {
+    const filters: string[] = [];
+    
+    if (settings.brightness !== 100) filters.push(`brightness(${settings.brightness}%)`);
+    if (settings.contrast !== 100) filters.push(`contrast(${settings.contrast}%)`);
+    if (settings.saturation !== 100) filters.push(`saturate(${settings.saturation}%)`);
+    if (settings.blur > 0) filters.push(`blur(${settings.blur}px)`);
+    if (settings.hueRotate !== 0) filters.push(`hue-rotate(${settings.hueRotate}deg)`);
+    if (settings.invert) filters.push('invert(100%)');
+    if (settings.grayscale) filters.push('grayscale(100%)');
+    if (settings.sepia) filters.push('sepia(100%)');
+    
+    ctx.filter = filters.length > 0 ? filters.join(' ') : 'none';
+  };
+
+  // Get CSS filter string for video element
+  const getVideoFilterStyle = (): string => {
+    const filters: string[] = [];
+    
+    if (settings.brightness !== 100) filters.push(`brightness(${settings.brightness}%)`);
+    if (settings.contrast !== 100) filters.push(`contrast(${settings.contrast}%)`);
+    if (settings.saturation !== 100) filters.push(`saturate(${settings.saturation}%)`);
+    if (settings.blur > 0) filters.push(`blur(${settings.blur}px)`);
+    if (settings.hueRotate !== 0) filters.push(`hue-rotate(${settings.hueRotate}deg)`);
+    if (settings.invert) filters.push('invert(100%)');
+    if (settings.grayscale) filters.push('grayscale(100%)');
+    if (settings.sepia) filters.push('sepia(100%)');
+    
+    return filters.join(' ');
+  };
+
+  // Reset settings to default
+  const resetSettings = () => {
+    setSettings({
+      brightness: 100,
+      contrast: 100,
+      saturation: 100,
+      invert: false,
+      grayscale: false,
+      sepia: false,
+      blur: 0,
+      hueRotate: 0,
+    });
+  };
+
   // Capture photo
   const capturePhoto = () => {
     if (!videoRef.current || !canvasRef.current) return;
@@ -147,6 +215,9 @@ export const Camera: React.FC = () => {
     // Set canvas size to video size
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
+
+    // Apply filters to canvas
+    applyFilters(context);
 
     // Draw video frame to canvas
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -232,10 +303,19 @@ export const Camera: React.FC = () => {
                 playsInline
                 muted
                 className={`camera-video ${isCapturing ? 'capturing' : ''}`}
+                style={{ filter: getVideoFilterStyle() }}
               />
               <canvas ref={canvasRef} style={{ display: 'none' }} />
               
               <div className="camera-controls">
+                <button
+                  onClick={() => setShowSettings(!showSettings)}
+                  className={`camera-control-button ${showSettings ? 'active' : ''}`}
+                  title="Settings"
+                >
+                  <Settings size={24} />
+                </button>
+                
                 {devices.length > 1 && (
                   <button
                     onClick={switchCamera}
@@ -268,6 +348,127 @@ export const Camera: React.FC = () => {
             </>
           )}
         </div>
+
+        {/* Settings Panel */}
+        {showSettings && (
+          <div className="camera-settings-panel">
+            <div className="camera-settings-header">
+              <h3>Camera Settings</h3>
+              <button
+                onClick={resetSettings}
+                className="reset-settings-button"
+                title="Reset to defaults"
+              >
+                <RotateCcw size={16} />
+                Reset
+              </button>
+            </div>
+            
+            <div className="camera-settings-content">
+              {/* Brightness */}
+              <div className="setting-item">
+                <label>
+                  <span>Brightness</span>
+                  <span className="setting-value">{settings.brightness}%</span>
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="200"
+                  value={settings.brightness}
+                  onChange={(e) => setSettings({ ...settings, brightness: parseInt(e.target.value) })}
+                  className="setting-slider"
+                />
+              </div>
+
+              {/* Contrast */}
+              <div className="setting-item">
+                <label>
+                  <span>Contrast</span>
+                  <span className="setting-value">{settings.contrast}%</span>
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="200"
+                  value={settings.contrast}
+                  onChange={(e) => setSettings({ ...settings, contrast: parseInt(e.target.value) })}
+                  className="setting-slider"
+                />
+              </div>
+
+              {/* Saturation */}
+              <div className="setting-item">
+                <label>
+                  <span>Saturation</span>
+                  <span className="setting-value">{settings.saturation}%</span>
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="200"
+                  value={settings.saturation}
+                  onChange={(e) => setSettings({ ...settings, saturation: parseInt(e.target.value) })}
+                  className="setting-slider"
+                />
+              </div>
+
+              {/* Blur */}
+              <div className="setting-item">
+                <label>
+                  <span>Blur</span>
+                  <span className="setting-value">{settings.blur}px</span>
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="10"
+                  value={settings.blur}
+                  onChange={(e) => setSettings({ ...settings, blur: parseInt(e.target.value) })}
+                  className="setting-slider"
+                />
+              </div>
+
+              {/* Hue Rotate */}
+              <div className="setting-item">
+                <label>
+                  <span>Hue Rotate</span>
+                  <span className="setting-value">{settings.hueRotate}°</span>
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="360"
+                  value={settings.hueRotate}
+                  onChange={(e) => setSettings({ ...settings, hueRotate: parseInt(e.target.value) })}
+                  className="setting-slider"
+                />
+              </div>
+
+              {/* Toggle Effects */}
+              <div className="setting-toggles">
+                <button
+                  className={`setting-toggle ${settings.invert ? 'active' : ''}`}
+                  onClick={() => setSettings({ ...settings, invert: !settings.invert })}
+                >
+                  Invert
+                </button>
+                <button
+                  className={`setting-toggle ${settings.grayscale ? 'active' : ''}`}
+                  onClick={() => setSettings({ ...settings, grayscale: !settings.grayscale })}
+                >
+                  Grayscale
+                </button>
+                <button
+                  className={`setting-toggle ${settings.sepia ? 'active' : ''}`}
+                  onClick={() => setSettings({ ...settings, sepia: !settings.sepia })}
+                >
+                  Sepia
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="camera-sidebar">
           <div className="camera-sidebar-header">
