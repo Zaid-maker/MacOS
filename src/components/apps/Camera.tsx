@@ -17,6 +17,7 @@ interface CameraSettings {
   sepia: boolean;
   blur: number;
   hueRotate: number;
+  mirror: boolean;
 }
 
 export const Camera: React.FC = () => {
@@ -40,6 +41,7 @@ export const Camera: React.FC = () => {
     sepia: false,
     blur: 0,
     hueRotate: 0,
+    mirror: false,
   });
 
   // Load photos from localStorage on mount
@@ -199,6 +201,7 @@ export const Camera: React.FC = () => {
       sepia: false,
       blur: 0,
       hueRotate: 0,
+      mirror: false,
     });
   };
 
@@ -219,8 +222,19 @@ export const Camera: React.FC = () => {
     // Apply filters to canvas
     applyFilters(context);
 
+    // Apply mirror transformation if enabled
+    if (settings.mirror) {
+      context.translate(canvas.width, 0);
+      context.scale(-1, 1);
+    }
+
     // Draw video frame to canvas
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    // Reset transformation
+    if (settings.mirror) {
+      context.setTransform(1, 0, 0, 1, 0, 0);
+    }
 
     // Convert to data URL
     const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
@@ -303,7 +317,10 @@ export const Camera: React.FC = () => {
                 playsInline
                 muted
                 className={`camera-video ${isCapturing ? 'capturing' : ''}`}
-                style={{ filter: getVideoFilterStyle() }}
+                style={{ 
+                  filter: getVideoFilterStyle(),
+                  transform: settings.mirror ? 'scaleX(-1)' : 'none'
+                }}
               />
               <canvas ref={canvasRef} style={{ display: 'none' }} />
               
@@ -464,6 +481,16 @@ export const Camera: React.FC = () => {
                   onClick={() => setSettings({ ...settings, sepia: !settings.sepia })}
                 >
                   Sepia
+                </button>
+              </div>
+
+              {/* Camera Settings */}
+              <div className="setting-toggles">
+                <button
+                  className={`setting-toggle ${settings.mirror ? 'active' : ''}`}
+                  onClick={() => setSettings({ ...settings, mirror: !settings.mirror })}
+                >
+                  Mirror
                 </button>
               </div>
             </div>
