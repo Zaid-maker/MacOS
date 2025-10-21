@@ -35,7 +35,7 @@ export const useKeyboardShortcuts = ({ onSpotlight, onMissionControl }: UseKeybo
       // Cmd/Ctrl + Q - Quit app (close focused window)
       if (cmdKey && e.key === 'q') {
         e.preventDefault();
-        const focusedWindow = windows.find(w => w.isFocused);
+        const focusedWindow = windows.find((w) => w.isFocused);
         if (focusedWindow) {
           closeWindow(focusedWindow.id);
         }
@@ -45,7 +45,7 @@ export const useKeyboardShortcuts = ({ onSpotlight, onMissionControl }: UseKeybo
       // Cmd/Ctrl + W - Close window
       if (cmdKey && e.key === 'w') {
         e.preventDefault();
-        const focusedWindow = windows.find(w => w.isFocused);
+        const focusedWindow = windows.find((w) => w.isFocused);
         if (focusedWindow) {
           closeWindow(focusedWindow.id);
         }
@@ -55,7 +55,7 @@ export const useKeyboardShortcuts = ({ onSpotlight, onMissionControl }: UseKeybo
       // Cmd/Ctrl + M - Minimize window
       if (cmdKey && e.key === 'm') {
         e.preventDefault();
-        const focusedWindow = windows.find(w => w.isFocused);
+        const focusedWindow = windows.find((w) => w.isFocused);
         if (focusedWindow) {
           minimizeWindow(focusedWindow.id);
         }
@@ -65,7 +65,7 @@ export const useKeyboardShortcuts = ({ onSpotlight, onMissionControl }: UseKeybo
       // Cmd/Ctrl + H - Hide window (minimize)
       if (cmdKey && e.key === 'h') {
         e.preventDefault();
-        const focusedWindow = windows.find(w => w.isFocused);
+        const focusedWindow = windows.find((w) => w.isFocused);
         if (focusedWindow) {
           minimizeWindow(focusedWindow.id);
         }
@@ -76,7 +76,7 @@ export const useKeyboardShortcuts = ({ onSpotlight, onMissionControl }: UseKeybo
       if (cmdKey && e.key === 'Tab') {
         e.preventDefault();
         if (windows.length > 0) {
-          const currentIndex = windows.findIndex(w => w.isFocused);
+          const currentIndex = windows.findIndex((w) => w.isFocused);
           const nextIndex = (currentIndex + 1) % windows.length;
           const nextWindow = windows[nextIndex];
           if (nextWindow && !nextWindow.isMinimized) {

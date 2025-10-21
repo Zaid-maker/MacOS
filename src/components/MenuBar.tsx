@@ -1,10 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { Apple, Wifi, Battery, Volume2, VolumeX, Search, LogOut, Moon, Sun, Grid3x3, SlidersHorizontal } from 'lucide-react';
-import { useOS } from '../contexts/OSContext';
+import {
+  Apple,
+  Battery,
+  Grid3x3,
+  LogOut,
+  Moon,
+  Search,
+  SlidersHorizontal,
+  Sun,
+  Volume2,
+  VolumeX,
+  Wifi,
+} from 'lucide-react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { useTheme } from '../contexts/ThemeContext';
+import { useOS } from '../contexts/OSContext';
 import { useSound } from '../contexts/SoundContext';
 import { useSpaces } from '../contexts/SpacesContext';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface MenuBarProps {
   onSpotlightOpen: () => void;
@@ -45,12 +57,12 @@ export const MenuBar: React.FC<MenuBarProps> = React.memo(({ onSpotlightOpen, on
     });
   };
 
-  const activeAppData = apps.find(app => app.id === activeApp);
+  const activeAppData = apps.find((app) => app.id === activeApp);
 
   return (
     <div className="menu-bar">
       <div className="menu-bar-left">
-        <div 
+        <div
           className="menu-item apple-menu"
           onClick={(e) => {
             e.stopPropagation();
@@ -68,10 +80,13 @@ export const MenuBar: React.FC<MenuBarProps> = React.memo(({ onSpotlightOpen, on
                 <span>System Preferences...</span>
               </div>
               <div className="dropdown-divider" />
-              <div className="dropdown-item" onClick={(e) => {
-                e.stopPropagation();
-                logout();
-              }}>
+              <div
+                className="dropdown-item"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  logout();
+                }}
+              >
                 <LogOut size={14} />
                 <span>Log Out {currentUser?.name}...</span>
               </div>
@@ -88,9 +103,7 @@ export const MenuBar: React.FC<MenuBarProps> = React.memo(({ onSpotlightOpen, on
             </div>
           )}
         </div>
-        <div className="menu-item menu-app-name">
-          {activeAppData?.name || 'Finder'}
-        </div>
+        <div className="menu-item menu-app-name">{activeAppData?.name || 'Finder'}</div>
         <div className="menu-item">File</div>
         <div className="menu-item">Edit</div>
         <div className="menu-item">View</div>
@@ -120,9 +133,7 @@ export const MenuBar: React.FC<MenuBarProps> = React.memo(({ onSpotlightOpen, on
         <div className="menu-item" onClick={toggleMute} title="Toggle Sound">
           {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
         </div>
-        <div className="menu-item time">
-          {formatTime(currentTime)}
-        </div>
+        <div className="menu-item time">{formatTime(currentTime)}</div>
       </div>
     </div>
   );

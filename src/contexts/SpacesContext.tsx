@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import type React from 'react';
 import type { ReactNode } from 'react';
+import { createContext, useCallback, useContext, useState } from 'react';
 
 interface Space {
   id: string;
@@ -44,16 +45,19 @@ export const SpacesProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     setSpaces((prev) => [...prev, newSpace]);
   }, [spaces.length]);
 
-  const removeSpace = useCallback((spaceId: string) => {
-    if (spaces.length <= 1) return; // Keep at least one space
-    
-    setSpaces((prev) => prev.filter((s) => s.id !== spaceId));
-    
-    // Switch to first space if removing current space
-    if (currentSpaceId === spaceId) {
-      setCurrentSpaceId(spaces[0].id === spaceId ? spaces[1].id : spaces[0].id);
-    }
-  }, [spaces, currentSpaceId]);
+  const removeSpace = useCallback(
+    (spaceId: string) => {
+      if (spaces.length <= 1) return; // Keep at least one space
+
+      setSpaces((prev) => prev.filter((s) => s.id !== spaceId));
+
+      // Switch to first space if removing current space
+      if (currentSpaceId === spaceId) {
+        setCurrentSpaceId(spaces[0].id === spaceId ? spaces[1].id : spaces[0].id);
+      }
+    },
+    [spaces, currentSpaceId]
+  );
 
   const moveWindowToSpace = useCallback((windowId: string, targetSpaceId: string) => {
     setSpaces((prev) =>

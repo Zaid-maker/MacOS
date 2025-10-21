@@ -1,7 +1,7 @@
-import React, { useState, useRef } from 'react';
-import { useOS } from '../contexts/OSContext';
+import React, { useRef, useState } from 'react';
 import { useContextMenu } from '../contexts/ContextMenuContext';
 import { useNotifications } from '../contexts/NotificationContext';
+import { useOS } from '../contexts/OSContext';
 import type { App } from '../types';
 
 interface DockProps {
@@ -18,25 +18,27 @@ export const Dock: React.FC<DockProps> = React.memo(({ apps }) => {
   const handleDockItemContextMenu = (e: React.MouseEvent, app: App) => {
     e.preventDefault();
     e.stopPropagation();
-    
-    const appWindows = windows.filter(w => w.appId === app.id);
-    
+
+    const appWindows = windows.filter((w) => w.appId === app.id);
+
     showContextMenu(e.clientX, e.clientY, [
       {
         label: app.isRunning ? 'Show' : 'Open',
         icon: '📂',
         onClick: () => openApp(app.id),
       },
-      ...(appWindows.length > 0 ? [
-        {
-          label: 'Close All Windows',
-          icon: '❌',
-          onClick: () => {
-            appWindows.forEach(w => closeWindow(w.id));
-            addNotification(app.name, 'All windows closed', 'success');
-          },
-        },
-      ] : []),
+      ...(appWindows.length > 0
+        ? [
+            {
+              label: 'Close All Windows',
+              icon: '❌',
+              onClick: () => {
+                appWindows.forEach((w) => closeWindow(w.id));
+                addNotification(app.name, 'All windows closed', 'success');
+              },
+            },
+          ]
+        : []),
       { divider: true },
       {
         label: 'Options',

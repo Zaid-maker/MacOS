@@ -1,22 +1,23 @@
-import React, { useState } from 'react';
 import {
-  Volume2,
-  VolumeX,
-  Sun,
-  Wifi,
   Bluetooth,
-  Moon,
-  Monitor,
   Cast,
   Focus,
+  Monitor,
+  Moon,
   Music,
-  Play,
   Pause,
-  SkipForward,
+  Play,
   SkipBack,
+  SkipForward,
+  Sun,
+  Volume2,
+  VolumeX,
+  Wifi,
 } from 'lucide-react';
-import { useTheme } from '../contexts/ThemeContext';
+import type React from 'react';
+import { useState } from 'react';
 import { useSound } from '../contexts/SoundContext';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface ControlCenterProps {
   isOpen: boolean;
@@ -62,9 +63,7 @@ export const ControlCenter: React.FC<ControlCenterProps> = ({ isOpen, onClose })
               </div>
               <div className="control-card-label">
                 <div className="control-card-title">Wi-Fi</div>
-                <div className="control-card-subtitle">
-                  {wifiEnabled ? 'Home Network' : 'Off'}
-                </div>
+                <div className="control-card-subtitle">{wifiEnabled ? 'Home Network' : 'Off'}</div>
               </div>
             </button>
 
@@ -78,9 +77,7 @@ export const ControlCenter: React.FC<ControlCenterProps> = ({ isOpen, onClose })
               </div>
               <div className="control-card-label">
                 <div className="control-card-title">Bluetooth</div>
-                <div className="control-card-subtitle">
-                  {bluetoothEnabled ? 'On' : 'Off'}
-                </div>
+                <div className="control-card-subtitle">{bluetoothEnabled ? 'On' : 'Off'}</div>
               </div>
             </button>
 
@@ -94,25 +91,16 @@ export const ControlCenter: React.FC<ControlCenterProps> = ({ isOpen, onClose })
               </div>
               <div className="control-card-label">
                 <div className="control-card-title">AirDrop</div>
-                <div className="control-card-subtitle">
-                  {airdropEnabled ? 'Everyone' : 'Off'}
-                </div>
+                <div className="control-card-subtitle">{airdropEnabled ? 'Everyone' : 'Off'}</div>
               </div>
             </button>
 
             {/* Dark Mode */}
-            <button
-              className={`control-card ${isDarkMode ? 'active' : ''}`}
-              onClick={toggleDarkMode}
-            >
-              <div className="control-card-icon">
-                {isDarkMode ? <Moon size={20} /> : <Sun size={20} />}
-              </div>
+            <button className={`control-card ${isDarkMode ? 'active' : ''}`} onClick={toggleDarkMode}>
+              <div className="control-card-icon">{isDarkMode ? <Moon size={20} /> : <Sun size={20} />}</div>
               <div className="control-card-label">
                 <div className="control-card-title">Appearance</div>
-                <div className="control-card-subtitle">
-                  {isDarkMode ? 'Dark' : 'Light'}
-                </div>
+                <div className="control-card-subtitle">{isDarkMode ? 'Dark' : 'Light'}</div>
               </div>
             </button>
           </div>
@@ -139,11 +127,7 @@ export const ControlCenter: React.FC<ControlCenterProps> = ({ isOpen, onClose })
             <div className="control-slider-header">
               {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
               <span>Sound</span>
-              <button
-                className="control-mute-button"
-                onClick={toggleMute}
-                title={isMuted ? 'Unmute' : 'Mute'}
-              >
+              <button className="control-mute-button" onClick={toggleMute} title={isMuted ? 'Unmute' : 'Mute'}>
                 {isMuted ? <VolumeX size={14} /> : <Volume2 size={14} />}
               </button>
             </div>
@@ -196,11 +180,7 @@ export const ControlCenter: React.FC<ControlCenterProps> = ({ isOpen, onClose })
               <button className="playback-button" disabled>
                 <SkipBack size={16} />
               </button>
-              <button
-                className="playback-button play-button"
-                onClick={() => setIsPlaying(!isPlaying)}
-                disabled
-              >
+              <button className="playback-button play-button" onClick={() => setIsPlaying(!isPlaying)} disabled>
                 {isPlaying ? <Pause size={20} /> : <Play size={20} />}
               </button>
               <button className="playback-button" disabled>

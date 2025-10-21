@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Folder, File, ChevronRight, ChevronDown, Home, Star, Clock, FileText } from 'lucide-react';
+import { ChevronDown, ChevronRight, Clock, File, FileText, Folder, Home, Star } from 'lucide-react';
+import type React from 'react';
+import { useState } from 'react';
 import { useNotifications } from '../../contexts/NotificationContext';
 
 interface FileItem {
@@ -33,14 +34,12 @@ export const Finder: React.FC = () => {
   const handleDrop = (e: React.DragEvent, targetFolder: FileItem) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     if (targetFolder.type === 'folder' && draggedItem) {
-      addNotification(
-        'File Moved',
-        `"${draggedItem}" moved to "${targetFolder.name}"`,
-        'success',
-        { appIcon: '📁', duration: 3000 }
-      );
+      addNotification('File Moved', `"${draggedItem}" moved to "${targetFolder.name}"`, 'success', {
+        appIcon: '📁',
+        duration: 3000,
+      });
       setDraggedItem(null);
     }
   };
@@ -72,7 +71,7 @@ export const Finder: React.FC = () => {
   ];
 
   const toggleFolder = (name: string) => {
-    setExpandedFolders(prev => {
+    setExpandedFolders((prev) => {
       const next = new Set(prev);
       if (next.has(name)) {
         next.delete(name);
@@ -103,11 +102,7 @@ export const Finder: React.FC = () => {
         >
           {item.type === 'folder' && (
             <span className="folder-icon">
-              {expandedFolders.has(item.name) ? (
-                <ChevronDown size={14} />
-              ) : (
-                <ChevronRight size={14} />
-              )}
+              {expandedFolders.has(item.name) ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
             </span>
           )}
           {item.type === 'folder' ? <Folder size={16} /> : <File size={16} />}
@@ -155,11 +150,7 @@ export const Finder: React.FC = () => {
           <div className="finder-grid">
             {fileStructure.map((item) => (
               <div key={item.name} className="finder-grid-item">
-                {item.type === 'folder' ? (
-                  <Folder size={48} color="#54a3ff" />
-                ) : (
-                  <FileText size={48} color="#888" />
-                )}
+                {item.type === 'folder' ? <Folder size={48} color="#54a3ff" /> : <FileText size={48} color="#888" />}
                 <div className="finder-grid-item-name">{item.name}</div>
               </div>
             ))}

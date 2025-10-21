@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { X, Info, CheckCircle, AlertTriangle, XCircle } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Info, X, XCircle } from 'lucide-react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
 import { useNotifications } from '../contexts/NotificationContext';
 import type { Notification } from '../types';
 
@@ -63,26 +64,20 @@ const ToastItem: React.FC<ToastItemProps> = ({ notification, onClose }) => {
   const formatTime = (date: Date) => {
     const now = new Date();
     const diff = Math.floor((now.getTime() - date.getTime()) / 1000);
-    
+
     if (diff < 60) return 'Just now';
     if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
     return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
   };
 
   return (
-    <div
-      className={`notification-toast notification-${notification.type} ${
-        isExiting ? 'exiting' : ''
-      }`}
-    >
+    <div className={`notification-toast notification-${notification.type} ${isExiting ? 'exiting' : ''}`}>
       <div className="notification-header">
         <div className="notification-icon-wrapper">
           {notification.appIcon ? (
             <span className="notification-app-icon">{notification.appIcon}</span>
           ) : (
-            <div className={`notification-type-icon icon-${notification.type}`}>
-              {getIcon()}
-            </div>
+            <div className={`notification-type-icon icon-${notification.type}`}>{getIcon()}</div>
           )}
         </div>
         <div className="notification-title-section">
@@ -112,10 +107,7 @@ const ToastItem: React.FC<ToastItemProps> = ({ notification, onClose }) => {
       )}
       {(notification.duration ?? 0) > 0 && (
         <div className="notification-progress">
-          <div
-            className="notification-progress-bar"
-            style={{ width: `${progress}%` }}
-          />
+          <div className="notification-progress-bar" style={{ width: `${progress}%` }} />
         </div>
       )}
     </div>

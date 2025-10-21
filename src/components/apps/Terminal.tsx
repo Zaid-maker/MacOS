@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
+import type React from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNotifications } from '../../contexts/NotificationContext';
 
 interface FileSystem {
@@ -63,8 +64,8 @@ export const Terminal: React.FC = () => {
     const trimmedCmd = cmd.trim();
     if (!trimmedCmd) return;
 
-    setCommandHistory(prev => [...prev, trimmedCmd]);
-    setHistory(prev => [...prev, `${getPrompt()} ${trimmedCmd}`]);
+    setCommandHistory((prev) => [...prev, trimmedCmd]);
+    setHistory((prev) => [...prev, `${getPrompt()} ${trimmedCmd}`]);
 
     const [command, ...args] = trimmedCmd.split(' ');
 
@@ -74,7 +75,7 @@ export const Terminal: React.FC = () => {
         setHistory([]);
         return;
       case 'help':
-        setHistory(prev => [
+        setHistory((prev) => [
           ...prev,
           'Available commands:',
           '',
@@ -103,29 +104,31 @@ export const Terminal: React.FC = () => {
         ]);
         return;
       case 'date':
-        setHistory(prev => [...prev, new Date().toString(), '']);
+        setHistory((prev) => [...prev, new Date().toString(), '']);
         return;
       case 'whoami':
-        setHistory(prev => [...prev, 'user', '']);
+        setHistory((prev) => [...prev, 'user', '']);
         return;
       case 'uname':
-        setHistory(prev => [...prev, 'Darwin MacOS 14.0 x86_64', '']);
+        setHistory((prev) => [...prev, 'Darwin MacOS 14.0 x86_64', '']);
         return;
       case 'pwd':
-        setHistory(prev => [...prev, '/' + currentPath.join('/').replace('~', 'Users/user'), '']);
+        setHistory((prev) => [...prev, '/' + currentPath.join('/').replace('~', 'Users/user'), '']);
         return;
       case 'ls': {
         const current = getCurrentDir();
         if (typeof current === 'object') {
           const items = Object.keys(current);
           if (items.length === 0) {
-            setHistory(prev => [...prev, '', '']);
+            setHistory((prev) => [...prev, '', '']);
           } else {
-            const output = items.map(item => {
-              const isDir = typeof current[item] === 'object';
-              return isDir ? `\x1b[34m${item}/\x1b[0m` : item;
-            }).join('    ');
-            setHistory(prev => [...prev, output, '']);
+            const output = items
+              .map((item) => {
+                const isDir = typeof current[item] === 'object';
+                return isDir ? `\x1b[34m${item}/\x1b[0m` : item;
+              })
+              .join('    ');
+            setHistory((prev) => [...prev, output, '']);
           }
         }
         return;
@@ -134,21 +137,21 @@ export const Terminal: React.FC = () => {
         const target = args[0];
         if (!target || target === '~') {
           setCurrentPath(['~']);
-          setHistory(prev => [...prev, '']);
+          setHistory((prev) => [...prev, '']);
         } else if (target === '..') {
           if (currentPath.length > 1) {
             setCurrentPath(currentPath.slice(0, -1));
-            setHistory(prev => [...prev, '']);
+            setHistory((prev) => [...prev, '']);
           } else {
-            setHistory(prev => [...prev, '']);
+            setHistory((prev) => [...prev, '']);
           }
         } else {
           const current = getCurrentDir();
           if (typeof current === 'object' && current[target] && typeof current[target] === 'object') {
             setCurrentPath([...currentPath, target]);
-            setHistory(prev => [...prev, '']);
+            setHistory((prev) => [...prev, '']);
           } else {
-            setHistory(prev => [...prev, `cd: no such file or directory: ${target}`, '']);
+            setHistory((prev) => [...prev, `cd: no such file or directory: ${target}`, '']);
           }
         }
         return;
@@ -156,19 +159,19 @@ export const Terminal: React.FC = () => {
       case 'cat': {
         const filename = args[0];
         if (!filename) {
-          setHistory(prev => [...prev, 'cat: missing file argument', '']);
+          setHistory((prev) => [...prev, 'cat: missing file argument', '']);
           return;
         }
         const current = getCurrentDir();
         if (typeof current === 'object' && current[filename]) {
           const content = current[filename];
           if (typeof content === 'string') {
-            setHistory(prev => [...prev, content, '']);
+            setHistory((prev) => [...prev, content, '']);
           } else {
-            setHistory(prev => [...prev, `cat: ${filename}: Is a directory`, '']);
+            setHistory((prev) => [...prev, `cat: ${filename}: Is a directory`, '']);
           }
         } else {
-          setHistory(prev => [...prev, `cat: ${filename}: No such file or directory`, '']);
+          setHistory((prev) => [...prev, `cat: ${filename}: No such file or directory`, '']);
         }
         return;
       }
@@ -192,79 +195,58 @@ export const Terminal: React.FC = () => {
         const current = getCurrentDir();
         if (typeof current === 'object') {
           const tree = renderTree(current);
-          setHistory(prev => [...prev, '.', ...tree, '']);
+          setHistory((prev) => [...prev, '.', ...tree, '']);
         }
         return;
       }
       case 'echo':
-        setHistory(prev => [...prev, args.join(' '), '']);
+        setHistory((prev) => [...prev, args.join(' '), '']);
         return;
-      case 'history':
+      case 'history': {
         const historyOutput = commandHistory.map((cmd, i) => `  ${i + 1}  ${cmd}`);
-        setHistory(prev => [...prev, ...historyOutput, '']);
+        setHistory((prev) => [...prev, ...historyOutput, '']);
         return;
+      }
       case 'notify':
-        addNotification(
-          'Terminal Notification',
-          'This is a test notification from the Terminal app!',
-          'info',
-          { appIcon: '⌨️', duration: 5000 }
-        );
-        setHistory(prev => [...prev, 'Notification sent!', '']);
+        addNotification('Terminal Notification', 'This is a test notification from the Terminal app!', 'info', {
+          appIcon: '⌨️',
+          duration: 5000,
+        });
+        setHistory((prev) => [...prev, 'Notification sent!', '']);
         break;
       case 'notify-success':
-        addNotification(
-          'Success!',
-          'Operation completed successfully.',
-          'success',
-          { duration: 5000 }
-        );
-        setHistory(prev => [...prev, 'Success notification sent!', '']);
+        addNotification('Success!', 'Operation completed successfully.', 'success', { duration: 5000 });
+        setHistory((prev) => [...prev, 'Success notification sent!', '']);
         break;
       case 'notify-warning':
-        addNotification(
-          'Warning',
-          'This action may have consequences.',
-          'warning',
-          { duration: 5000 }
-        );
-        setHistory(prev => [...prev, 'Warning notification sent!', '']);
+        addNotification('Warning', 'This action may have consequences.', 'warning', { duration: 5000 });
+        setHistory((prev) => [...prev, 'Warning notification sent!', '']);
         break;
       case 'notify-error':
-        addNotification(
-          'Error',
-          'Something went wrong!',
-          'error',
-          { duration: 5000 }
-        );
-        setHistory(prev => [...prev, 'Error notification sent!', '']);
+        addNotification('Error', 'Something went wrong!', 'error', { duration: 5000 });
+        setHistory((prev) => [...prev, 'Error notification sent!', '']);
         break;
       case 'notify-action':
-        addNotification(
-          'New Message',
-          'You have received a new message',
-          'info',
-          {
-            appIcon: '💬',
-            duration: 10000,
-            actions: [
-              {
-                label: 'Reply',
-                onClick: () => {
-                  addNotification('Reply Sent', 'Your reply has been sent!', 'success');
-                },
+        addNotification('New Message', 'You have received a new message', 'info', {
+          appIcon: '💬',
+          duration: 10000,
+          actions: [
+            {
+              label: 'Reply',
+              onClick: () => {
+                addNotification('Reply Sent', 'Your reply has been sent!', 'success');
               },
-              {
-                label: 'Dismiss',
-                onClick: () => {},
-              },
-            ],
-          }
-        );
-        setHistory(prev => [...prev, 'Action notification sent!', '']);
+            },
+            {
+              label: 'Dismiss',
+              onClick: () => {},
+            },
+          ],
+        });
+        setHistory((prev) => [...prev, 'Action notification sent!', '']);
         break;
       default:
-        setHistory(prev => [...prev, `zsh: command not found: ${command}`, '']);
+        setHistory((prev) => [...prev, `zsh: command not found: ${command}`, '']);
         return;
     }
   };
@@ -300,13 +282,11 @@ export const Terminal: React.FC = () => {
     <div className="terminal" onClick={() => inputRef.current?.focus()}>
       <div className="terminal-content" ref={terminalRef}>
         {history.map((line, i) => (
-          <div 
-            key={i} 
+          <div
+            key={i}
             className="terminal-line"
             dangerouslySetInnerHTML={{
-              __html: line
-                .replace(/\x1b\[34m/g, '<span style="color: #0a84ff;">')
-                .replace(/\x1b\[0m/g, '</span>')
+              __html: line.replace(/\x1b\[34m/g, '<span style="color: #0a84ff;">').replace(/\x1b\[0m/g, '</span>'),
             }}
           />
         ))}

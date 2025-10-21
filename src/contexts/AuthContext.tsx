@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState } from 'react';
+import type React from 'react';
+import { createContext, useContext, useState } from 'react';
 import type { User } from '../types';
 
 interface AuthContextType {
@@ -37,7 +38,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [users] = useState<User[]>(defaultUsers);
 
   const login = (userId: string, password: string): boolean => {
-    const user = users.find(u => u.id === userId);
+    const user = users.find((u) => u.id === userId);
     if (user && (user.password === password || user.password === '')) {
       setCurrentUser(user);
       return true;

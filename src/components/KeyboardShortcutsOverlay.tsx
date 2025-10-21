@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
 import { Command } from 'lucide-react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
 
 export const KeyboardShortcutsOverlay: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -9,7 +10,7 @@ export const KeyboardShortcutsOverlay: React.FC = () => {
       // Show shortcuts overlay with Cmd+/
       if ((e.metaKey || e.ctrlKey) && e.key === '/') {
         e.preventDefault();
-        setIsVisible(prev => !prev);
+        setIsVisible((prev) => !prev);
       }
       // Hide with Escape
       if (e.key === 'Escape' && isVisible) {

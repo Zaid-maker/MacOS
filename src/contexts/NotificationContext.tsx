@@ -1,7 +1,8 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import type React from 'react';
 import type { ReactNode } from 'react';
-import { useSound } from './SoundContext';
+import { createContext, useCallback, useContext, useState } from 'react';
 import type { Notification, NotificationAction } from '../types';
+import { useSound } from './SoundContext';
 
 interface NotificationContextType {
   notifications: Notification[];
@@ -82,9 +83,7 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
   }, []);
 
   return (
-    <NotificationContext.Provider
-      value={{ notifications, addNotification, removeNotification, clearAll }}
-    >
+    <NotificationContext.Provider value={{ notifications, addNotification, removeNotification, clearAll }}>
       {children}
     </NotificationContext.Provider>
   );

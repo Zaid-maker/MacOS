@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import type React from 'react';
 import type { ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
 export interface ContextMenuItem {
   label?: string;
@@ -36,12 +37,12 @@ export const ContextMenuProvider: React.FC<{ children: ReactNode }> = ({ childre
   useEffect(() => {
     const handleClick = () => hideContextMenu();
     const handleContextMenu = () => hideContextMenu();
-    
+
     if (contextMenu) {
       document.addEventListener('click', handleClick);
       document.addEventListener('contextmenu', handleContextMenu);
     }
-    
+
     return () => {
       document.removeEventListener('click', handleClick);
       document.removeEventListener('contextmenu', handleContextMenu);
@@ -60,7 +61,7 @@ export const ContextMenuProvider: React.FC<{ children: ReactNode }> = ({ childre
           }}
           onClick={(e) => e.stopPropagation()}
         >
-          {contextMenu.items.map((item, index) => (
+          {contextMenu.items.map((item, index) =>
             item.divider ? (
               <div key={index} className="context-menu-divider" />
             ) : (
@@ -79,7 +80,7 @@ export const ContextMenuProvider: React.FC<{ children: ReactNode }> = ({ childre
                 <span className="context-menu-label">{item.label}</span>
               </button>
             )
-          ))}
+          )}
         </div>
       )}
     </ContextMenuContext.Provider>

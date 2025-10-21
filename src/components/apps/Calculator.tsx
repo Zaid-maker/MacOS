@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
 
 export const Calculator: React.FC = () => {
   const [display, setDisplay] = useState('0');
@@ -43,13 +44,13 @@ export const Calculator: React.FC = () => {
 
   const handleOperation = (op: string) => {
     const currentValue = parseFloat(display);
-    
+
     if (previousValue !== null && operation && !newNumber) {
       handleEquals();
     } else {
       setPreviousValue(currentValue);
     }
-    
+
     setOperation(op);
     setNewNumber(true);
   };
@@ -76,7 +77,7 @@ export const Calculator: React.FC = () => {
     }
 
     const calculation = `${previousValue} ${operation} ${currentValue} = ${result}`;
-    setHistory(prev => [calculation, ...prev].slice(0, 10));
+    setHistory((prev) => [calculation, ...prev].slice(0, 10));
     setDisplay(result.toString());
     setPreviousValue(null);
     setOperation(null);
@@ -159,16 +160,10 @@ export const Calculator: React.FC = () => {
   return (
     <div className="calculator">
       <div className="calculator-header">
-        <button 
-          className={`calc-mode-btn ${!scientificMode ? 'active' : ''}`}
-          onClick={() => setScientificMode(false)}
-        >
+        <button className={`calc-mode-btn ${!scientificMode ? 'active' : ''}`} onClick={() => setScientificMode(false)}>
           Basic
         </button>
-        <button 
-          className={`calc-mode-btn ${scientificMode ? 'active' : ''}`}
-          onClick={() => setScientificMode(true)}
-        >
+        <button className={`calc-mode-btn ${scientificMode ? 'active' : ''}`} onClick={() => setScientificMode(true)}>
           Scientific
         </button>
       </div>
@@ -176,54 +171,112 @@ export const Calculator: React.FC = () => {
         <div className="calculator-memory">{memory !== 0 && `M: ${memory}`}</div>
         <div className="calculator-main-display">{display}</div>
       </div>
-      {history.length > 0 && (
-        <div className="calculator-history">
-          {history[0]}
-        </div>
-      )}
+      {history.length > 0 && <div className="calculator-history">{history[0]}</div>}
       <div className={`calculator-buttons ${scientificMode ? 'scientific' : ''}`}>
         {scientificMode && (
           <>
-            <button className="calc-btn function" onClick={handleMemoryClear}>MC</button>
-            <button className="calc-btn function" onClick={handleMemoryRecall}>MR</button>
-            <button className="calc-btn function" onClick={handleMemoryAdd}>M+</button>
-            <button className="calc-btn function" onClick={handleMemorySubtract}>M-</button>
-            
-            <button className="calc-btn function" onClick={handleSin}>sin</button>
-            <button className="calc-btn function" onClick={handleCos}>cos</button>
-            <button className="calc-btn function" onClick={handleTan}>tan</button>
-            <button className="calc-btn function" onClick={handleLog}>log</button>
-            
-            <button className="calc-btn function" onClick={handleLn}>ln</button>
-            <button className="calc-btn function" onClick={handleSquare}>x²</button>
-            <button className="calc-btn function" onClick={handleSquareRoot}>√</button>
-            <button className="calc-btn function" onClick={handleBackspace}>⌫</button>
+            <button className="calc-btn function" onClick={handleMemoryClear}>
+              MC
+            </button>
+            <button className="calc-btn function" onClick={handleMemoryRecall}>
+              MR
+            </button>
+            <button className="calc-btn function" onClick={handleMemoryAdd}>
+              M+
+            </button>
+            <button className="calc-btn function" onClick={handleMemorySubtract}>
+              M-
+            </button>
+
+            <button className="calc-btn function" onClick={handleSin}>
+              sin
+            </button>
+            <button className="calc-btn function" onClick={handleCos}>
+              cos
+            </button>
+            <button className="calc-btn function" onClick={handleTan}>
+              tan
+            </button>
+            <button className="calc-btn function" onClick={handleLog}>
+              log
+            </button>
+
+            <button className="calc-btn function" onClick={handleLn}>
+              ln
+            </button>
+            <button className="calc-btn function" onClick={handleSquare}>
+              x²
+            </button>
+            <button className="calc-btn function" onClick={handleSquareRoot}>
+              √
+            </button>
+            <button className="calc-btn function" onClick={handleBackspace}>
+              ⌫
+            </button>
           </>
         )}
-        
-        <button className="calc-btn function" onClick={handleClear}>AC</button>
-        <button className="calc-btn function" onClick={handleToggleSign}>±</button>
-        <button className="calc-btn function" onClick={handlePercent}>%</button>
-        <button className="calc-btn operator" onClick={() => handleOperation('÷')}>÷</button>
 
-        <button className="calc-btn" onClick={() => handleNumber('7')}>7</button>
-        <button className="calc-btn" onClick={() => handleNumber('8')}>8</button>
-        <button className="calc-btn" onClick={() => handleNumber('9')}>9</button>
-        <button className="calc-btn operator" onClick={() => handleOperation('×')}>×</button>
+        <button className="calc-btn function" onClick={handleClear}>
+          AC
+        </button>
+        <button className="calc-btn function" onClick={handleToggleSign}>
+          ±
+        </button>
+        <button className="calc-btn function" onClick={handlePercent}>
+          %
+        </button>
+        <button className="calc-btn operator" onClick={() => handleOperation('÷')}>
+          ÷
+        </button>
 
-        <button className="calc-btn" onClick={() => handleNumber('4')}>4</button>
-        <button className="calc-btn" onClick={() => handleNumber('5')}>5</button>
-        <button className="calc-btn" onClick={() => handleNumber('6')}>6</button>
-        <button className="calc-btn operator" onClick={() => handleOperation('-')}>−</button>
+        <button className="calc-btn" onClick={() => handleNumber('7')}>
+          7
+        </button>
+        <button className="calc-btn" onClick={() => handleNumber('8')}>
+          8
+        </button>
+        <button className="calc-btn" onClick={() => handleNumber('9')}>
+          9
+        </button>
+        <button className="calc-btn operator" onClick={() => handleOperation('×')}>
+          ×
+        </button>
 
-        <button className="calc-btn" onClick={() => handleNumber('1')}>1</button>
-        <button className="calc-btn" onClick={() => handleNumber('2')}>2</button>
-        <button className="calc-btn" onClick={() => handleNumber('3')}>3</button>
-        <button className="calc-btn operator" onClick={() => handleOperation('+')}>+</button>
+        <button className="calc-btn" onClick={() => handleNumber('4')}>
+          4
+        </button>
+        <button className="calc-btn" onClick={() => handleNumber('5')}>
+          5
+        </button>
+        <button className="calc-btn" onClick={() => handleNumber('6')}>
+          6
+        </button>
+        <button className="calc-btn operator" onClick={() => handleOperation('-')}>
+          −
+        </button>
 
-        <button className="calc-btn zero" onClick={() => handleNumber('0')}>0</button>
-        <button className="calc-btn" onClick={handleDecimal}>.</button>
-        <button className="calc-btn operator" onClick={handleEquals}>=</button>
+        <button className="calc-btn" onClick={() => handleNumber('1')}>
+          1
+        </button>
+        <button className="calc-btn" onClick={() => handleNumber('2')}>
+          2
+        </button>
+        <button className="calc-btn" onClick={() => handleNumber('3')}>
+          3
+        </button>
+        <button className="calc-btn operator" onClick={() => handleOperation('+')}>
+          +
+        </button>
+
+        <button className="calc-btn zero" onClick={() => handleNumber('0')}>
+          0
+        </button>
+        <button className="calc-btn" onClick={handleDecimal}>
+          .
+        </button>
+        <button className="calc-btn operator" onClick={handleEquals}>
+          =
+        </button>
       </div>
     </div>
   );

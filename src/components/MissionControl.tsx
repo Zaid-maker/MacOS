@@ -1,10 +1,12 @@
-import React, { useEffect } from 'react';
-import { X, Plus } from 'lucide-react';
-import { useSpaces } from '../contexts/SpacesContext';
+import { Plus, X } from 'lucide-react';
+import type React from 'react';
+import { useEffect } from 'react';
 import { useOS } from '../contexts/OSContext';
+import { useSpaces } from '../contexts/SpacesContext';
 
 export const MissionControl: React.FC = () => {
-  const { spaces, currentSpaceId, switchToSpace, addSpace, removeSpace, isMissionControlOpen, toggleMissionControl } = useSpaces();
+  const { spaces, currentSpaceId, switchToSpace, addSpace, removeSpace, isMissionControlOpen, toggleMissionControl } =
+    useSpaces();
   const { windows } = useOS();
 
   // Handle Escape key to close Mission Control
@@ -85,9 +87,7 @@ export const MissionControl: React.FC = () => {
                           <div className="space-window-title">{window.title}</div>
                         </div>
                       ))}
-                      {spaceWindows.length > 6 && (
-                        <div className="space-window-more">+{spaceWindows.length - 6}</div>
-                      )}
+                      {spaceWindows.length > 6 && <div className="space-window-more">+{spaceWindows.length - 6}</div>}
                     </div>
                   )}
                 </div>

@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState } from 'react';
+import type React from 'react';
 import type { ReactNode } from 'react';
+import { createContext, useContext, useState } from 'react';
 import type { Wallpaper } from '../types';
 
 export const wallpapers: Wallpaper[] = [
@@ -89,7 +90,7 @@ export const WallpaperProvider: React.FC<{ children: ReactNode }> = ({ children 
   const [currentWallpaper, setCurrentWallpaper] = useState<Wallpaper>(() => {
     const saved = localStorage.getItem('wallpaper');
     if (saved) {
-      const wallpaper = wallpapers.find(w => w.id === saved);
+      const wallpaper = wallpapers.find((w) => w.id === saved);
       if (wallpaper) return wallpaper;
     }
     return wallpapers[0];

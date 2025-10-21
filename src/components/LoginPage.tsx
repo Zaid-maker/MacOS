@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { ArrowLeft, AlertCircle } from 'lucide-react';
+import { AlertCircle, ArrowLeft } from 'lucide-react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNotifications } from '../contexts/NotificationContext';
 import type { User } from '../types';
@@ -64,7 +65,7 @@ export const LoginPage: React.FC = () => {
         let greeting = 'Good morning';
         if (hour >= 12 && hour < 17) greeting = 'Good afternoon';
         if (hour >= 17) greeting = 'Good evening';
-        
+
         addNotification(
           `${greeting}, ${selectedUser.name}!`,
           'Welcome back to macOS. Your desktop is ready.',
@@ -84,7 +85,7 @@ export const LoginPage: React.FC = () => {
   return (
     <div className="login-page">
       <div className="login-wallpaper" />
-      
+
       <div className="login-header">
         <div className="login-time">{formatTime(currentTime)}</div>
         <div className="login-date">{formatDate(currentTime)}</div>
@@ -95,27 +96,21 @@ export const LoginPage: React.FC = () => {
           <div className="user-selection">
             <h2 className="login-title">Select a user to log in</h2>
             <div className="user-grid">
-              {users.map(user => (
-                <div
-                  key={user.id}
-                  className="user-card"
-                  onClick={() => handleUserSelect(user)}
-                >
+              {users.map((user) => (
+                <div key={user.id} className="user-card" onClick={() => handleUserSelect(user)}>
                   <div className="user-avatar">{user.avatar}</div>
                   <div className="user-name">{user.name}</div>
                 </div>
               ))}
             </div>
-            <div className="login-hint">
-              Hint: Default password is "password" (or empty for Guest)
-            </div>
+            <div className="login-hint">Hint: Default password is "password" (or empty for Guest)</div>
           </div>
         ) : (
           <div className={`login-form-container ${isShaking ? 'shake' : ''}`}>
             <button className="back-button" onClick={handleBack}>
               <ArrowLeft size={20} />
             </button>
-            
+
             <div className="selected-user">
               <div className="selected-user-avatar">{selectedUser.avatar}</div>
               <div className="selected-user-name">{selectedUser.name}</div>
@@ -142,7 +137,7 @@ export const LoginPage: React.FC = () => {
                   </div>
                 )}
               </div>
-              
+
               <button type="submit" className="login-button">
                 <span className="login-arrow">→</span>
               </button>
@@ -160,9 +155,15 @@ export const LoginPage: React.FC = () => {
 
       <div className="login-footer">
         <div className="login-footer-icons">
-          <button className="footer-icon" title="Accessibility">♿</button>
-          <button className="footer-icon" title="Language">🌐</button>
-          <button className="footer-icon" title="Power">⏻</button>
+          <button className="footer-icon" title="Accessibility">
+            ♿
+          </button>
+          <button className="footer-icon" title="Language">
+            🌐
+          </button>
+          <button className="footer-icon" title="Power">
+            ⏻
+          </button>
         </div>
       </div>
     </div>

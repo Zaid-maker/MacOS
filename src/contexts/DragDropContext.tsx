@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import type React from 'react';
 import type { ReactNode } from 'react';
+import { createContext, useCallback, useContext, useState } from 'react';
 
 interface DragData {
   type: 'desktop-icon' | 'dock-app' | 'file';
@@ -31,9 +32,7 @@ export const DragDropProvider: React.FC<{ children: ReactNode }> = ({ children }
   }, []);
 
   return (
-    <DragDropContext.Provider value={{ isDragging, dragData, startDrag, endDrag }}>
-      {children}
-    </DragDropContext.Provider>
+    <DragDropContext.Provider value={{ isDragging, dragData, startDrag, endDrag }}>{children}</DragDropContext.Provider>
   );
 };
 

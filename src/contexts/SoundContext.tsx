@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useCallback } from 'react';
 import type { ReactNode } from 'react';
+import React, { createContext, useCallback, useContext } from 'react';
 
 type SoundType = 'click' | 'open' | 'close' | 'minimize' | 'error' | 'success' | 'notification' | 'trash';
 
@@ -45,48 +45,47 @@ const createMultiToneSound = (frequencies: number[], durations: number[], types?
 export const SoundProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [isMuted, setIsMuted] = React.useState(false);
 
-  const playSound = useCallback((sound: SoundType) => {
-    if (isMuted) return;
+  const playSound = useCallback(
+    (sound: SoundType) => {
+      if (isMuted) return;
 
-    switch (sound) {
-      case 'click':
-        createOscillatorSound(800, 0.05, 'sine');
-        break;
-      case 'open':
-        createMultiToneSound([400, 600, 800], [0.05, 0.05, 0.08]);
-        break;
-      case 'close':
-        createMultiToneSound([800, 600, 400], [0.05, 0.05, 0.08]);
-        break;
-      case 'minimize':
-        createMultiToneSound([600, 400], [0.08, 0.12]);
-        break;
-      case 'error':
-        createMultiToneSound([300, 250, 200], [0.1, 0.1, 0.15], ['square', 'square', 'square']);
-        break;
-      case 'success':
-        createMultiToneSound([523, 659, 784], [0.08, 0.08, 0.12]);
-        break;
-      case 'notification':
-        createMultiToneSound([659, 880], [0.08, 0.15]);
-        break;
-      case 'trash':
-        createMultiToneSound([500, 300, 200], [0.06, 0.06, 0.1], ['triangle', 'triangle', 'triangle']);
-        break;
-      default:
-        break;
-    }
-  }, [isMuted]);
+      switch (sound) {
+        case 'click':
+          createOscillatorSound(800, 0.05, 'sine');
+          break;
+        case 'open':
+          createMultiToneSound([400, 600, 800], [0.05, 0.05, 0.08]);
+          break;
+        case 'close':
+          createMultiToneSound([800, 600, 400], [0.05, 0.05, 0.08]);
+          break;
+        case 'minimize':
+          createMultiToneSound([600, 400], [0.08, 0.12]);
+          break;
+        case 'error':
+          createMultiToneSound([300, 250, 200], [0.1, 0.1, 0.15], ['square', 'square', 'square']);
+          break;
+        case 'success':
+          createMultiToneSound([523, 659, 784], [0.08, 0.08, 0.12]);
+          break;
+        case 'notification':
+          createMultiToneSound([659, 880], [0.08, 0.15]);
+          break;
+        case 'trash':
+          createMultiToneSound([500, 300, 200], [0.06, 0.06, 0.1], ['triangle', 'triangle', 'triangle']);
+          break;
+        default:
+          break;
+      }
+    },
+    [isMuted]
+  );
 
   const toggleMute = useCallback(() => {
-    setIsMuted(prev => !prev);
+    setIsMuted((prev) => !prev);
   }, []);
 
-  return (
-    <SoundContext.Provider value={{ playSound, isMuted, toggleMute }}>
-      {children}
-    </SoundContext.Provider>
-  );
+  return <SoundContext.Provider value={{ playSound, isMuted, toggleMute }}>{children}</SoundContext.Provider>;
 };
 
 export const useSound = () => {

@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Download, Trash2, X, Search, Grid3x3, List, Calendar, Image as ImageIcon, Heart, Share2 } from 'lucide-react';
+import { Calendar, Download, Grid3x3, Heart, Image as ImageIcon, List, Search, Share2, Trash2, X } from 'lucide-react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
 
 interface Photo {
   id: string;
@@ -18,16 +19,16 @@ export const Photos: React.FC = () => {
   // Load photos from localStorage on mount
   useEffect(() => {
     loadPhotos();
-    
+
     // Listen for storage changes (when Camera app captures new photos)
     const handleStorageChange = () => {
       loadPhotos();
     };
-    
+
     window.addEventListener('storage', handleStorageChange);
     // Also listen for custom event from Camera app
     window.addEventListener('photosCaptured', handleStorageChange);
-    
+
     return () => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('photosCaptured', handleStorageChange);
@@ -44,9 +45,7 @@ export const Photos: React.FC = () => {
           // Convert timestamp to number if it's a Date string
           const normalizedPhotos = parsedPhotos.map((photo: any) => ({
             ...photo,
-            timestamp: typeof photo.timestamp === 'string' 
-              ? new Date(photo.timestamp).getTime() 
-              : photo.timestamp
+            timestamp: typeof photo.timestamp === 'string' ? new Date(photo.timestamp).getTime() : photo.timestamp,
           }));
           setPhotos(normalizedPhotos);
         } else {
@@ -73,7 +72,7 @@ export const Photos: React.FC = () => {
   };
 
   const handleDelete = (photoId: string) => {
-    const updatedPhotos = photos.filter(p => p.id !== photoId);
+    const updatedPhotos = photos.filter((p) => p.id !== photoId);
     setPhotos(updatedPhotos);
     localStorage.setItem('cameraPhotos', JSON.stringify(updatedPhotos));
     if (selectedPhoto?.id === photoId) {
@@ -82,30 +81,28 @@ export const Photos: React.FC = () => {
   };
 
   const toggleFavorite = (photoId: string) => {
-    const updatedPhotos = photos.map(p => 
-      p.id === photoId ? { ...p, favorite: !p.favorite } : p
-    );
+    const updatedPhotos = photos.map((p) => (p.id === photoId ? { ...p, favorite: !p.favorite } : p));
     setPhotos(updatedPhotos);
     localStorage.setItem('cameraPhotos', JSON.stringify(updatedPhotos));
     if (selectedPhoto?.id === photoId) {
-      setSelectedPhoto(updatedPhotos.find(p => p.id === photoId) || null);
+      setSelectedPhoto(updatedPhotos.find((p) => p.id === photoId) || null);
     }
   };
 
   const formatDate = (timestamp: number) => {
     const date = new Date(timestamp);
-    return date.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric', 
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
       year: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   };
 
   const filteredPhotos = photos
-    .filter(photo => filterMode === 'all' || photo.favorite)
-    .filter(photo => {
+    .filter((photo) => filterMode === 'all' || photo.favorite)
+    .filter((photo) => {
       if (!searchQuery) return true;
       const searchLower = searchQuery.toLowerCase();
       const date = formatDate(photo.timestamp).toLowerCase();
@@ -119,9 +116,9 @@ export const Photos: React.FC = () => {
         <div className="photos-sidebar-header">
           <h3>Library</h3>
         </div>
-        
+
         <div className="photos-sidebar-sections">
-          <button 
+          <button
             className={`photos-sidebar-item ${filterMode === 'all' ? 'active' : ''}`}
             onClick={() => setFilterMode('all')}
           >
@@ -129,16 +126,16 @@ export const Photos: React.FC = () => {
             <span>All Photos</span>
             <span className="photos-count">{photos.length}</span>
           </button>
-          
-          <button 
+
+          <button
             className={`photos-sidebar-item ${filterMode === 'favorites' ? 'active' : ''}`}
             onClick={() => setFilterMode('favorites')}
           >
             <Heart size={18} />
             <span>Favorites</span>
-            <span className="photos-count">{photos.filter(p => p.favorite).length}</span>
+            <span className="photos-count">{photos.filter((p) => p.favorite).length}</span>
           </button>
-          
+
           <button className="photos-sidebar-item" disabled>
             <Calendar size={18} />
             <span>Recent</span>
@@ -159,7 +156,7 @@ export const Photos: React.FC = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          
+
           <div className="photos-toolbar-actions">
             <button
               className={`photos-view-btn ${viewMode === 'grid' ? 'active' : ''}`}
@@ -184,11 +181,11 @@ export const Photos: React.FC = () => {
             <div className="photos-empty-icon">📷</div>
             <h2>No Photos Yet</h2>
             <p>
-              {searchQuery 
+              {searchQuery
                 ? 'No photos match your search.'
                 : filterMode === 'favorites'
-                ? 'You haven\'t favorited any photos yet.'
-                : 'Photos you capture with the Camera app will appear here.'}
+                  ? "You haven't favorited any photos yet."
+                  : 'Photos you capture with the Camera app will appear here.'}
             </p>
           </div>
         ) : (
@@ -196,11 +193,7 @@ export const Photos: React.FC = () => {
             {viewMode === 'grid' ? (
               <div className="photos-grid">
                 {filteredPhotos.map((photo) => (
-                  <div
-                    key={photo.id}
-                    className="photo-grid-item"
-                    onClick={() => setSelectedPhoto(photo)}
-                  >
+                  <div key={photo.id} className="photo-grid-item" onClick={() => setSelectedPhoto(photo)}>
                     <img src={photo.dataUrl} alt={`Photo ${photo.id}`} />
                     {photo.favorite && (
                       <div className="photo-favorite-badge">
@@ -213,17 +206,11 @@ export const Photos: React.FC = () => {
             ) : (
               <div className="photos-list">
                 {filteredPhotos.map((photo) => (
-                  <div
-                    key={photo.id}
-                    className="photo-list-item"
-                    onClick={() => setSelectedPhoto(photo)}
-                  >
+                  <div key={photo.id} className="photo-list-item" onClick={() => setSelectedPhoto(photo)}>
                     <img src={photo.dataUrl} alt={`Photo ${photo.id}`} />
                     <div className="photo-list-info">
                       <span className="photo-list-date">{formatDate(photo.timestamp)}</span>
-                      {photo.favorite && (
-                        <Heart size={14} fill="currentColor" className="photo-list-favorite" />
-                      )}
+                      {photo.favorite && <Heart size={14} fill="currentColor" className="photo-list-favorite" />}
                     </div>
                     <div className="photo-list-actions">
                       <button
@@ -257,37 +244,29 @@ export const Photos: React.FC = () => {
       {selectedPhoto && (
         <div className="photo-viewer-modal" onClick={() => setSelectedPhoto(null)}>
           <div className="photo-viewer-content" onClick={(e) => e.stopPropagation()}>
-            <button
-              className="photo-viewer-close"
-              onClick={() => setSelectedPhoto(null)}
-              title="Close"
-            >
+            <button className="photo-viewer-close" onClick={() => setSelectedPhoto(null)} title="Close">
               <X size={20} />
             </button>
-            
+
             <img src={selectedPhoto.dataUrl} alt="Selected photo" />
-            
+
             <div className="photo-viewer-info">
               <span>{formatDate(selectedPhoto.timestamp)}</span>
             </div>
-            
+
             <div className="photo-viewer-actions">
               <button
                 className={`photo-viewer-action ${selectedPhoto.favorite ? 'active' : ''}`}
                 onClick={() => toggleFavorite(selectedPhoto.id)}
-                title={selectedPhoto.favorite ? "Remove from Favorites" : "Add to Favorites"}
+                title={selectedPhoto.favorite ? 'Remove from Favorites' : 'Add to Favorites'}
               >
-                <Heart size={20} fill={selectedPhoto.favorite ? "currentColor" : "none"} />
+                <Heart size={20} fill={selectedPhoto.favorite ? 'currentColor' : 'none'} />
               </button>
-              
-              <button
-                className="photo-viewer-action"
-                onClick={() => handleDownload(selectedPhoto)}
-                title="Download"
-              >
+
+              <button className="photo-viewer-action" onClick={() => handleDownload(selectedPhoto)} title="Download">
                 <Download size={20} />
               </button>
-              
+
               <button
                 className="photo-viewer-action"
                 onClick={() => {
@@ -298,7 +277,7 @@ export const Photos: React.FC = () => {
               >
                 <Share2 size={20} />
               </button>
-              
+
               <button
                 className="photo-viewer-action delete"
                 onClick={() => handleDelete(selectedPhoto.id)}

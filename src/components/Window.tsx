@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, useCallback } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useOS } from '../contexts/OSContext';
 import type { AppWindow } from '../types';
 
@@ -18,25 +18,28 @@ export const Window: React.FC<WindowProps> = React.memo(({ window, children }) =
   const [hasControlFocus, setHasControlFocus] = useState(false);
   const animationFrameRef = useRef<number | undefined>(undefined);
 
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (animationFrameRef.current) {
-      cancelAnimationFrame(animationFrameRef.current);
-    }
-
-    animationFrameRef.current = requestAnimationFrame(() => {
-      if (isDragging) {
-        const newX = e.clientX - dragOffset.x;
-        const newY = Math.max(25, e.clientY - dragOffset.y);
-        updateWindowPosition(window.id, { x: newX, y: newY });
-      } else if (isResizing) {
-        const deltaX = e.clientX - resizeStart.x;
-        const deltaY = e.clientY - resizeStart.y;
-        const newWidth = Math.max(400, resizeStart.width + deltaX);
-        const newHeight = Math.max(300, resizeStart.height + deltaY);
-        updateWindowSize(window.id, { width: newWidth, height: newHeight });
+  const handleMouseMove = useCallback(
+    (e: MouseEvent) => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
       }
-    });
-  }, [isDragging, isResizing, dragOffset, resizeStart, window.id, updateWindowPosition, updateWindowSize]);
+
+      animationFrameRef.current = requestAnimationFrame(() => {
+        if (isDragging) {
+          const newX = e.clientX - dragOffset.x;
+          const newY = Math.max(25, e.clientY - dragOffset.y);
+          updateWindowPosition(window.id, { x: newX, y: newY });
+        } else if (isResizing) {
+          const deltaX = e.clientX - resizeStart.x;
+          const deltaY = e.clientY - resizeStart.y;
+          const newWidth = Math.max(400, resizeStart.width + deltaX);
+          const newHeight = Math.max(300, resizeStart.height + deltaY);
+          updateWindowSize(window.id, { width: newWidth, height: newHeight });
+        }
+      });
+    },
+    [isDragging, isResizing, dragOffset, resizeStart, window.id, updateWindowPosition, updateWindowSize]
+  );
 
   const handleMouseUp = useCallback(() => {
     setIsDragging(false);
@@ -60,7 +63,7 @@ export const Window: React.FC<WindowProps> = React.memo(({ window, children }) =
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if ((e.target as HTMLElement).closest('.window-controls')) return;
-    
+
     focusWindow(window.id);
     setIsDragging(true);
     const rect = windowRef.current?.getBoundingClientRect();
@@ -153,9 +156,7 @@ export const Window: React.FC<WindowProps> = React.memo(({ window, children }) =
         <div className="window-title">{window.title}</div>
       </div>
       <div className="window-content">{children}</div>
-      {!window.isMaximized && (
-        <div className="window-resize-handle" onMouseDown={handleResizeMouseDown} />
-      )}
+      {!window.isMaximized && <div className="window-resize-handle" onMouseDown={handleResizeMouseDown} />}
     </div>
   );
 });

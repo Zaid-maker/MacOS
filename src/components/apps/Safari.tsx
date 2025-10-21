@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { ArrowLeft, ArrowRight, RotateCw, Home, Lock } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Home, Lock, RotateCw } from 'lucide-react';
+import type React from 'react';
+import { useState } from 'react';
 
 export const Safari: React.FC = () => {
   const [url, setUrl] = useState('https://www.apple.com');

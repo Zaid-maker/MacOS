@@ -1,37 +1,37 @@
-import { useEffect, useState, lazy, Suspense } from 'react';
-import { OSProvider, useOS } from './contexts/OSContext';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { ThemeProvider, useTheme } from './contexts/ThemeContext';
-import { WallpaperProvider, useWallpaper } from './contexts/WallpaperContext';
-import { NotificationProvider } from './contexts/NotificationContext';
-import { ContextMenuProvider } from './contexts/ContextMenuContext';
-import { DragDropProvider } from './contexts/DragDropContext';
-import { SoundProvider } from './contexts/SoundContext';
-import { SpacesProvider, useSpaces } from './contexts/SpacesContext';
-import { MenuBar } from './components/MenuBar';
-import { Dock } from './components/Dock';
-import { Desktop } from './components/Desktop';
-import { Window } from './components/Window';
-import { LoginPage } from './components/LoginPage';
-import { Spotlight } from './components/Spotlight';
-import { KeyboardShortcutsOverlay } from './components/KeyboardShortcutsOverlay';
-import { NotificationToast } from './components/NotificationToast';
-import { MissionControl } from './components/MissionControl';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { BootAnimation } from './components/BootAnimation';
 import { ControlCenter } from './components/ControlCenter';
+import { Desktop } from './components/Desktop';
+import { Dock } from './components/Dock';
+import { KeyboardShortcutsOverlay } from './components/KeyboardShortcutsOverlay';
+import { LoginPage } from './components/LoginPage';
+import { MenuBar } from './components/MenuBar';
+import { MissionControl } from './components/MissionControl';
+import { NotificationToast } from './components/NotificationToast';
+import { Spotlight } from './components/Spotlight';
+import { Window } from './components/Window';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { ContextMenuProvider } from './contexts/ContextMenuContext';
+import { DragDropProvider } from './contexts/DragDropContext';
+import { NotificationProvider } from './contexts/NotificationContext';
+import { OSProvider, useOS } from './contexts/OSContext';
+import { SoundProvider } from './contexts/SoundContext';
+import { SpacesProvider, useSpaces } from './contexts/SpacesContext';
+import { ThemeProvider, useTheme } from './contexts/ThemeContext';
+import { useWallpaper, WallpaperProvider } from './contexts/WallpaperContext';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import type { App, DesktopIcon } from './types';
 import './App.css';
 
 // Lazy load app components
-const Finder = lazy(() => import('./components/apps/Finder').then(m => ({ default: m.Finder })));
-const Safari = lazy(() => import('./components/apps/Safari').then(m => ({ default: m.Safari })));
-const Terminal = lazy(() => import('./components/apps/Terminal').then(m => ({ default: m.Terminal })));
-const Calculator = lazy(() => import('./components/apps/Calculator').then(m => ({ default: m.Calculator })));
-const Notes = lazy(() => import('./components/apps/Notes').then(m => ({ default: m.Notes })));
-const Settings = lazy(() => import('./components/apps/Settings').then(m => ({ default: m.Settings })));
-const Camera = lazy(() => import('./components/apps/Camera').then(m => ({ default: m.Camera })));
-const Photos = lazy(() => import('./components/apps/Photos').then(m => ({ default: m.Photos })));
+const Finder = lazy(() => import('./components/apps/Finder').then((m) => ({ default: m.Finder })));
+const Safari = lazy(() => import('./components/apps/Safari').then((m) => ({ default: m.Safari })));
+const Terminal = lazy(() => import('./components/apps/Terminal').then((m) => ({ default: m.Terminal })));
+const Calculator = lazy(() => import('./components/apps/Calculator').then((m) => ({ default: m.Calculator })));
+const Notes = lazy(() => import('./components/apps/Notes').then((m) => ({ default: m.Notes })));
+const Settings = lazy(() => import('./components/apps/Settings').then((m) => ({ default: m.Settings })));
+const Camera = lazy(() => import('./components/apps/Camera').then((m) => ({ default: m.Camera })));
+const Photos = lazy(() => import('./components/apps/Photos').then((m) => ({ default: m.Photos })));
 
 const apps: App[] = [
   { id: 'finder', name: 'Finder', icon: '📁', color: '#54a3ff', component: Finder },
@@ -74,13 +74,13 @@ function OSContent() {
 
   return (
     <div className={`macos ${isDarkMode ? 'dark-mode' : ''}`} style={{ background: currentWallpaper.gradient }}>
-      <MenuBar 
+      <MenuBar
         onSpotlightOpen={() => setIsSpotlightOpen(true)}
         onControlCenterToggle={() => setIsControlCenterOpen(!isControlCenterOpen)}
       />
       <Desktop icons={desktopIcons} />
-      {windows.map(window => {
-        const app = contextApps.find(a => a.id === window.appId);
+      {windows.map((window) => {
+        const app = contextApps.find((a) => a.id === window.appId);
         const AppComponent = app?.component;
         return (
           <Window key={window.id} window={window}>

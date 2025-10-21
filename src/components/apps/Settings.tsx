@@ -1,5 +1,5 @@
-import React from 'react';
-import { User, Wifi, Bell, Monitor, Lock, Palette } from 'lucide-react';
+import { Bell, Lock, Monitor, Palette, User, Wifi } from 'lucide-react';
+import type React from 'react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useWallpaper } from '../../contexts/WallpaperContext';
 
@@ -55,11 +55,15 @@ export const Settings: React.FC = () => {
           <div className="settings-option">
             <label>
               <strong>Appearance</strong>
-              <select className="settings-select" value={isDarkMode ? 'dark' : 'light'} onChange={(e) => {
-                if ((e.target.value === 'dark') !== isDarkMode) {
-                  toggleDarkMode();
-                }
-              }}>
+              <select
+                className="settings-select"
+                value={isDarkMode ? 'dark' : 'light'}
+                onChange={(e) => {
+                  if ((e.target.value === 'dark') !== isDarkMode) {
+                    toggleDarkMode();
+                  }
+                }}
+              >
                 <option value="light">Light</option>
                 <option value="dark">Dark</option>
               </select>
@@ -91,9 +95,7 @@ export const Settings: React.FC = () => {
               >
                 <div className="wallpaper-thumbnail">{wallpaper.thumbnail}</div>
                 <div className="wallpaper-name">{wallpaper.name}</div>
-                {currentWallpaper.id === wallpaper.id && (
-                  <div className="wallpaper-check">✓</div>
-                )}
+                {currentWallpaper.id === wallpaper.id && <div className="wallpaper-check">✓</div>}
               </div>
             ))}
           </div>

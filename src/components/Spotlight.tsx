@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Search, FileText, Folder, Calculator, Settings as SettingsIcon } from 'lucide-react';
+import { Calculator, FileText, Folder, Search, Settings as SettingsIcon } from 'lucide-react';
+import type React from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useOS } from '../contexts/OSContext';
 
 interface SpotlightProps {
@@ -43,7 +44,7 @@ export const Spotlight: React.FC<SpotlightProps> = ({ isOpen, onClose }) => {
 
   const getSearchResults = (): SearchResult[] => {
     if (!query.trim()) {
-      return apps.map(app => ({
+      return apps.map((app) => ({
         id: app.id,
         title: app.name,
         subtitle: 'Application',
@@ -60,7 +61,7 @@ export const Spotlight: React.FC<SpotlightProps> = ({ isOpen, onClose }) => {
     const results: SearchResult[] = [];
 
     // Search apps
-    apps.forEach(app => {
+    apps.forEach((app) => {
       if (app.name.toLowerCase().includes(lowerQuery)) {
         results.push({
           id: app.id,
@@ -104,11 +105,11 @@ export const Spotlight: React.FC<SpotlightProps> = ({ isOpen, onClose }) => {
       },
     ];
 
-    systemItems.forEach(item => {
+    systemItems.forEach((item) => {
       if (
         item.title.toLowerCase().includes(lowerQuery) ||
         item.subtitle.toLowerCase().includes(lowerQuery) ||
-        item.keywords.some(k => k.includes(lowerQuery))
+        item.keywords.some((k) => k.includes(lowerQuery))
       ) {
         results.push(item as SearchResult);
       }
@@ -151,10 +152,10 @@ export const Spotlight: React.FC<SpotlightProps> = ({ isOpen, onClose }) => {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'ArrowDown') {
       e.preventDefault();
-      setSelectedIndex(prev => Math.min(prev + 1, results.length - 1));
+      setSelectedIndex((prev) => Math.min(prev + 1, results.length - 1));
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
-      setSelectedIndex(prev => Math.max(prev - 1, 0));
+      setSelectedIndex((prev) => Math.max(prev - 1, 0));
     } else if (e.key === 'Enter' && results[selectedIndex]) {
       e.preventDefault();
       results[selectedIndex].action();
@@ -180,9 +181,7 @@ export const Spotlight: React.FC<SpotlightProps> = ({ isOpen, onClose }) => {
             placeholder="Spotlight Search"
             className="spotlight-input"
           />
-          {query && (
-            <span className="spotlight-shortcut-hint">↵ to select</span>
-          )}
+          {query && <span className="spotlight-shortcut-hint">↵ to select</span>}
         </div>
 
         {results.length > 0 && (

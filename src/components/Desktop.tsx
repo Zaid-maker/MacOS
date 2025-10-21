@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { useOS } from '../contexts/OSContext';
 import { useContextMenu } from '../contexts/ContextMenuContext';
 import { useNotifications } from '../contexts/NotificationContext';
+import { useOS } from '../contexts/OSContext';
 import type { DesktopIcon } from '../types';
 
 interface DesktopProps {
@@ -12,8 +12,8 @@ export const Desktop: React.FC<DesktopProps> = React.memo(({ icons }) => {
   const { openApp } = useOS();
   const { showContextMenu } = useContextMenu();
   const { addNotification } = useNotifications();
-  const [iconPositions, setIconPositions] = useState<Record<string, { x: number; y: number }>>(
-    () => icons.reduce((acc, icon) => ({ ...acc, [icon.id]: icon.position }), {})
+  const [iconPositions, setIconPositions] = useState<Record<string, { x: number; y: number }>>(() =>
+    icons.reduce((acc, icon) => ({ ...acc, [icon.id]: icon.position }), {})
   );
   const [draggedIcon, setDraggedIcon] = useState<string | null>(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
@@ -21,10 +21,10 @@ export const Desktop: React.FC<DesktopProps> = React.memo(({ icons }) => {
   const handleIconMouseDown = (e: React.MouseEvent, icon: DesktopIcon) => {
     if (e.button !== 0) return; // Only left click
     e.stopPropagation();
-    
+
     const iconElement = e.currentTarget as HTMLElement;
     const rect = iconElement.getBoundingClientRect();
-    
+
     setDraggedIcon(icon.id);
     setDragOffset({
       x: e.clientX - rect.left,
@@ -34,14 +34,14 @@ export const Desktop: React.FC<DesktopProps> = React.memo(({ icons }) => {
 
   const handleMouseMove = (e: MouseEvent) => {
     if (!draggedIcon) return;
-    
+
     const desktopRect = document.querySelector('.desktop')?.getBoundingClientRect();
     if (!desktopRect) return;
-    
+
     const newX = Math.max(0, Math.min(e.clientX - desktopRect.left - dragOffset.x, desktopRect.width - 80));
     const newY = Math.max(0, Math.min(e.clientY - desktopRect.top - dragOffset.y, desktopRect.height - 100));
-    
-    setIconPositions(prev => ({
+
+    setIconPositions((prev) => ({
       ...prev,
       [draggedIcon]: { x: newX, y: newY },
     }));
@@ -139,7 +139,7 @@ export const Desktop: React.FC<DesktopProps> = React.memo(({ icons }) => {
   return (
     <div className="desktop" onContextMenu={handleDesktopContextMenu}>
       <div className="desktop-icons">
-        {icons.map(icon => {
+        {icons.map((icon) => {
           const position = iconPositions[icon.id] || icon.position;
           return (
             <div

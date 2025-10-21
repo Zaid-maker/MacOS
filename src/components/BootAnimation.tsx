@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
 import { Apple } from 'lucide-react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
 
 interface BootAnimationProps {
   onComplete: () => void;
@@ -13,7 +14,7 @@ export const BootAnimation: React.FC<BootAnimationProps> = ({ onComplete }) => {
   useEffect(() => {
     // Check if this is first boot
     const hasBooted = sessionStorage.getItem('hasBooted');
-    
+
     if (hasBooted) {
       // Skip animation if already booted this session
       onComplete();
@@ -32,14 +33,14 @@ export const BootAnimation: React.FC<BootAnimationProps> = ({ onComplete }) => {
 
     // Stage 2: Progress bar animation (3s)
     const progressInterval = setInterval(() => {
-      setProgress(prev => {
+      setProgress((prev) => {
         if (prev >= 100) {
           clearInterval(progressInterval);
           return 100;
         }
         // Simulate realistic boot progress
         // Fast start (0-40%): 10% increments
-        // Medium (40-80%): 5% increments  
+        // Medium (40-80%): 5% increments
         // Slow end (80-100%): 2% increments
         const increment = prev < 40 ? 10 : prev < 80 ? 5 : 2;
         return Math.min(prev + increment, 100);
@@ -77,28 +78,17 @@ export const BootAnimation: React.FC<BootAnimationProps> = ({ onComplete }) => {
         {stage !== 'logo' && (
           <div className="boot-progress-container">
             <div className="boot-progress-track">
-              <div 
-                className="boot-progress-bar" 
-                style={{ width: `${progress}%` }}
-              />
+              <div className="boot-progress-bar" style={{ width: `${progress}%` }} />
             </div>
           </div>
         )}
 
         {/* Startup text - appears when progress is significant */}
-        {stage === 'progress' && progress > 60 && (
-          <div className="boot-text">
-            macOS
-          </div>
-        )}
+        {stage === 'progress' && progress > 60 && <div className="boot-text">macOS</div>}
       </div>
 
       {/* Subtle version text at bottom */}
-      {stage === 'progress' && progress > 80 && (
-        <div className="boot-version">
-          Version 14.0
-        </div>
-      )}
+      {stage === 'progress' && progress > 80 && <div className="boot-version">Version 14.0</div>}
     </div>
   );
 };
