@@ -1288,6 +1288,12 @@ body {
   margin: 0;
 }
 
+.camera-settings-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .reset-settings-button {
   display: flex;
   align-items: center;
@@ -1304,6 +1310,27 @@ body {
 
 .reset-settings-button:hover {
   background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+}
+
+.close-settings-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #e5e5e7;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.close-settings-button:hover {
+  background: rgba(255, 59, 48, 0.8);
+  border-color: rgba(255, 59, 48, 1);
   transform: translateY(-1px);
 }
 

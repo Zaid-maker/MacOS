@@ -371,14 +371,23 @@ export const Camera: React.FC = () => {
           <div className="camera-settings-panel">
             <div className="camera-settings-header">
               <h3>Camera Settings</h3>
-              <button
-                onClick={resetSettings}
-                className="reset-settings-button"
-                title="Reset to defaults"
-              >
-                <RotateCcw size={16} />
-                Reset
-              </button>
+              <div className="camera-settings-actions">
+                <button
+                  onClick={resetSettings}
+                  className="reset-settings-button"
+                  title="Reset to defaults"
+                >
+                  <RotateCcw size={16} />
+                  Reset
+                </button>
+                <button
+                  onClick={() => setShowSettings(false)}
+                  className="close-settings-button"
+                  title="Close settings"
+                >
+                  <X size={18} />
+                </button>
+              </div>
             </div>
             
             <div className="camera-settings-content">
