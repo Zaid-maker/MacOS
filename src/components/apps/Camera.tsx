@@ -18,6 +18,7 @@ interface CameraSettings {
   blur: number;
   hueRotate: number;
   mirror: boolean;
+  frameRate: number;
 }
 
 export const Camera: React.FC = () => {
@@ -42,6 +43,7 @@ export const Camera: React.FC = () => {
     blur: 0,
     hueRotate: 0,
     mirror: false,
+    frameRate: 30,
   });
 
   // Load photos from localStorage on mount
@@ -94,7 +96,12 @@ export const Camera: React.FC = () => {
       }
 
       const constraints: MediaStreamConstraints = {
-        video: deviceId ? { deviceId: { exact: deviceId } } : true,
+        video: deviceId 
+          ? { 
+              deviceId: { exact: deviceId },
+              frameRate: { ideal: settings.frameRate }
+            } 
+          : { frameRate: { ideal: settings.frameRate } },
         audio: false,
       };
 
@@ -121,7 +128,7 @@ export const Camera: React.FC = () => {
     }
   };
 
-  // Start camera on mount
+  // Start camera on mount and when settings change
   useEffect(() => {
     startCamera(currentDeviceId);
 
@@ -132,7 +139,7 @@ export const Camera: React.FC = () => {
         streamRef.current = null;
       }
     };
-  }, [currentDeviceId]);
+  }, [currentDeviceId, settings.frameRate]);
 
   // Helper function to safely read photos from localStorage
   const getStoredPhotos = (): CapturedPhoto[] => {
@@ -202,6 +209,7 @@ export const Camera: React.FC = () => {
       blur: 0,
       hueRotate: 0,
       mirror: false,
+      frameRate: 30,
     });
   };
 
@@ -494,6 +502,33 @@ export const Camera: React.FC = () => {
               </div>
 
               {/* Camera Settings */}
+              <div className="setting-item">
+                <label>
+                  <span>Frame Rate</span>
+                  <span className="setting-value">{settings.frameRate} FPS</span>
+                </label>
+                <div className="setting-toggles">
+                  <button
+                    className={`setting-toggle ${settings.frameRate === 24 ? 'active' : ''}`}
+                    onClick={() => setSettings({ ...settings, frameRate: 24 })}
+                  >
+                    24 FPS
+                  </button>
+                  <button
+                    className={`setting-toggle ${settings.frameRate === 30 ? 'active' : ''}`}
+                    onClick={() => setSettings({ ...settings, frameRate: 30 })}
+                  >
+                    30 FPS
+                  </button>
+                  <button
+                    className={`setting-toggle ${settings.frameRate === 60 ? 'active' : ''}`}
+                    onClick={() => setSettings({ ...settings, frameRate: 60 })}
+                  >
+                    60 FPS
+                  </button>
+                </div>
+              </div>
+
               <div className="setting-toggles">
                 <button
                   className={`setting-toggle ${settings.mirror ? 'active' : ''}`}
