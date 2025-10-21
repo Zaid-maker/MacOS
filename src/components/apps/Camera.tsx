@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Camera as CameraIcon, Square, RotateCw, Download, Trash2, X, Settings, RotateCcw } from 'lucide-react';
+import { Camera as CameraIcon, Square, RotateCw, Download, Trash2, X, Settings, RotateCcw, Video, Circle, StopCircle } from 'lucide-react';
 
 interface CapturedPhoto {
   id: string;
@@ -7,6 +7,15 @@ interface CapturedPhoto {
   timestamp: number;
   favorite?: boolean;
 }
+
+interface CapturedVideo {
+  id: string;
+  dataUrl: string;
+  timestamp: number;
+  duration: number;
+}
+
+type Resolution = '480p' | '720p' | '1080p' | '4k';
 
 interface CameraSettings {
   brightness: number;
@@ -19,20 +28,29 @@ interface CameraSettings {
   hueRotate: number;
   mirror: boolean;
   frameRate: number;
+  resolution: Resolution;
 }
 
 export const Camera: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const recordedChunksRef = useRef<Blob[]>([]);
   const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
   const [currentDeviceId, setCurrentDeviceId] = useState<string>('');
   const [capturedPhotos, setCapturedPhotos] = useState<CapturedPhoto[]>([]);
+  const [capturedVideos, setCapturedVideos] = useState<CapturedVideo[]>([]);
   const [selectedPhoto, setSelectedPhoto] = useState<CapturedPhoto | null>(null);
+  const [selectedVideo, setSelectedVideo] = useState<CapturedVideo | null>(null);
+  const [sidebarTab, setSidebarTab] = useState<'photos' | 'videos'>('photos');
   const [error, setError] = useState<string>('');
   const [isCapturing, setIsCapturing] = useState(false);
   const [hasPermission, setHasPermission] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingDuration, setRecordingDuration] = useState(0);
+  const [mode, setMode] = useState<'photo' | 'video'>('photo');
   const [settings, setSettings] = useState<CameraSettings>({
     brightness: 100,
     contrast: 100,
@@ -44,6 +62,7 @@ export const Camera: React.FC = () => {
     hueRotate: 0,
     mirror: false,
     frameRate: 30,
+    resolution: '720p',
   });
 
   // Load photos from localStorage on mount
@@ -65,6 +84,22 @@ export const Camera: React.FC = () => {
       setCapturedPhotos([]);
     }
   }, []);
+
+  // Helper function to get resolution constraints
+  const getResolutionConstraints = (resolution: Resolution) => {
+    switch (resolution) {
+      case '480p':
+        return { width: 640, height: 480 };
+      case '720p':
+        return { width: 1280, height: 720 };
+      case '1080p':
+        return { width: 1920, height: 1080 };
+      case '4k':
+        return { width: 3840, height: 2160 };
+      default:
+        return { width: 1280, height: 720 };
+    }
+  };
 
   // Get available cameras
   useEffect(() => {
@@ -95,14 +130,22 @@ export const Camera: React.FC = () => {
         streamRef.current.getTracks().forEach(track => track.stop());
       }
 
+      const resolutionConstraints = getResolutionConstraints(settings.resolution);
+      
       const constraints: MediaStreamConstraints = {
         video: deviceId 
           ? { 
               deviceId: { exact: deviceId },
-              frameRate: { ideal: settings.frameRate }
+              frameRate: { ideal: settings.frameRate },
+              width: { ideal: resolutionConstraints.width },
+              height: { ideal: resolutionConstraints.height }
             } 
-          : { frameRate: { ideal: settings.frameRate } },
-        audio: false,
+          : { 
+              frameRate: { ideal: settings.frameRate },
+              width: { ideal: resolutionConstraints.width },
+              height: { ideal: resolutionConstraints.height }
+            },
+        audio: mode === 'video',
       };
 
       const mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
@@ -139,7 +182,7 @@ export const Camera: React.FC = () => {
         streamRef.current = null;
       }
     };
-  }, [currentDeviceId, settings.frameRate]);
+  }, [currentDeviceId, settings.frameRate, settings.resolution, mode]);
 
   // Helper function to safely read photos from localStorage
   const getStoredPhotos = (): CapturedPhoto[] => {
@@ -210,6 +253,7 @@ export const Camera: React.FC = () => {
       hueRotate: 0,
       mirror: false,
       frameRate: 30,
+      resolution: '720p',
     });
   };
 
@@ -269,6 +313,67 @@ export const Camera: React.FC = () => {
     setTimeout(() => setIsCapturing(false), 200);
   };
 
+  // Start video recording
+  const startRecording = () => {
+    if (!streamRef.current) return;
+
+    recordedChunksRef.current = [];
+    
+    try {
+      const options = { mimeType: 'video/webm;codecs=vp9' };
+      const mediaRecorder = new MediaRecorder(streamRef.current, options);
+      
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          recordedChunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(recordedChunksRef.current, { type: 'video/webm' });
+        const dataUrl = URL.createObjectURL(blob);
+        
+        const newVideo: CapturedVideo = {
+          id: Date.now().toString(),
+          dataUrl,
+          timestamp: Date.now(),
+          duration: recordingDuration,
+        };
+
+        setCapturedVideos(prev => [newVideo, ...prev]);
+        setRecordingDuration(0);
+      };
+
+      mediaRecorderRef.current = mediaRecorder;
+      mediaRecorder.start();
+      setIsRecording(true);
+      
+      // Start recording timer
+      const startTime = Date.now();
+      const timer = setInterval(() => {
+        setRecordingDuration(Math.floor((Date.now() - startTime) / 1000));
+      }, 1000);
+      
+      // Store timer ID for cleanup
+      (mediaRecorder as any).timerId = timer;
+    } catch (err) {
+      console.error('Error starting recording:', err);
+      setError('Unable to start video recording');
+    }
+  };
+
+  // Stop video recording
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      // Clear timer
+      const timerId = (mediaRecorderRef.current as any).timerId;
+      if (timerId) clearInterval(timerId);
+      
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+  };
+
   // Switch camera
   const switchCamera = async () => {
     if (devices.length <= 1) return;
@@ -305,6 +410,30 @@ export const Camera: React.FC = () => {
     }
   };
 
+  // Download video
+  const downloadVideo = (video: CapturedVideo) => {
+    const link = document.createElement('a');
+    link.href = video.dataUrl;
+    link.download = `video-${video.timestamp}.webm`;
+    link.click();
+  };
+
+  // Delete video
+  const deleteVideo = (videoId: string) => {
+    setCapturedVideos(prev => prev.filter(v => v.id !== videoId));
+    
+    if (selectedVideo?.id === videoId) {
+      setSelectedVideo(null);
+    }
+  };
+
+  // Format duration helper
+  const formatDuration = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
   return (
     <div className="camera-app">
       <div className="camera-main">
@@ -332,6 +461,32 @@ export const Camera: React.FC = () => {
               />
               <canvas ref={canvasRef} style={{ display: 'none' }} />
               
+              {/* Recording Duration Display */}
+              {isRecording && (
+                <div className="recording-indicator">
+                  <Circle className="recording-dot" size={12} fill="red" color="red" />
+                  <span>{Math.floor(recordingDuration / 60)}:{(recordingDuration % 60).toString().padStart(2, '0')}</span>
+                </div>
+              )}
+              
+              {/* Mode Switcher */}
+              <div className="camera-mode-switcher">
+                <button
+                  className={`mode-button ${mode === 'photo' ? 'active' : ''}`}
+                  onClick={() => setMode('photo')}
+                >
+                  <CameraIcon size={18} />
+                  Photo
+                </button>
+                <button
+                  className={`mode-button ${mode === 'video' ? 'active' : ''}`}
+                  onClick={() => setMode('video')}
+                >
+                  <Video size={18} />
+                  Video
+                </button>
+              </div>
+              
               <div className="camera-controls">
                 <button
                   onClick={() => setShowSettings(!showSettings)}
@@ -351,16 +506,29 @@ export const Camera: React.FC = () => {
                   </button>
                 )}
                 
-                <button
-                  onClick={capturePhoto}
-                  className="camera-capture-button"
-                  disabled={!hasPermission}
-                  title="Take Photo"
-                >
-                  <div className="capture-button-inner">
-                    <Square size={32} />
-                  </div>
-                </button>
+                {mode === 'photo' ? (
+                  <button
+                    onClick={capturePhoto}
+                    className="camera-capture-button"
+                    disabled={!hasPermission}
+                    title="Take Photo"
+                  >
+                    <div className="capture-button-inner">
+                      <Square size={32} />
+                    </div>
+                  </button>
+                ) : (
+                  <button
+                    onClick={isRecording ? stopRecording : startRecording}
+                    className={`camera-capture-button ${isRecording ? 'recording' : ''}`}
+                    disabled={!hasPermission}
+                    title={isRecording ? 'Stop Recording' : 'Start Recording'}
+                  >
+                    <div className="capture-button-inner">
+                      {isRecording ? <StopCircle size={32} /> : <Circle size={32} />}
+                    </div>
+                  </button>
+                )}
                 
                 <div className="camera-device-info">
                   {devices.length > 0 && (
@@ -504,6 +672,39 @@ export const Camera: React.FC = () => {
               {/* Camera Settings */}
               <div className="setting-item">
                 <label>
+                  <span>Resolution</span>
+                  <span className="setting-value">{settings.resolution.toUpperCase()}</span>
+                </label>
+                <div className="setting-toggles resolution-toggles">
+                  <button
+                    className={`setting-toggle ${settings.resolution === '480p' ? 'active' : ''}`}
+                    onClick={() => setSettings({ ...settings, resolution: '480p' })}
+                  >
+                    480p
+                  </button>
+                  <button
+                    className={`setting-toggle ${settings.resolution === '720p' ? 'active' : ''}`}
+                    onClick={() => setSettings({ ...settings, resolution: '720p' })}
+                  >
+                    720p
+                  </button>
+                  <button
+                    className={`setting-toggle ${settings.resolution === '1080p' ? 'active' : ''}`}
+                    onClick={() => setSettings({ ...settings, resolution: '1080p' })}
+                  >
+                    1080p
+                  </button>
+                  <button
+                    className={`setting-toggle ${settings.resolution === '4k' ? 'active' : ''}`}
+                    onClick={() => setSettings({ ...settings, resolution: '4k' })}
+                  >
+                    4K
+                  </button>
+                </div>
+              </div>
+
+              <div className="setting-item">
+                <label>
                   <span>Frame Rate</span>
                   <span className="setting-value">{settings.frameRate} FPS</span>
                 </label>
@@ -543,45 +744,100 @@ export const Camera: React.FC = () => {
 
         <div className="camera-sidebar">
           <div className="camera-sidebar-header">
-            <h3>Photos ({capturedPhotos.length})</h3>
+            <div className="sidebar-tabs">
+              <button
+                className={`sidebar-tab ${sidebarTab === 'photos' ? 'active' : ''}`}
+                onClick={() => setSidebarTab('photos')}
+              >
+                <CameraIcon size={16} />
+                Photos ({capturedPhotos.length})
+              </button>
+              <button
+                className={`sidebar-tab ${sidebarTab === 'videos' ? 'active' : ''}`}
+                onClick={() => setSidebarTab('videos')}
+              >
+                <Video size={16} />
+                Videos ({capturedVideos.length})
+              </button>
+            </div>
           </div>
           
           <div className="camera-photos-grid">
-            {capturedPhotos.length === 0 ? (
-              <div className="no-photos">
-                <CameraIcon size={32} />
-                <p>No photos taken yet</p>
-              </div>
-            ) : (
-              capturedPhotos.map(photo => (
-                <div
-                  key={photo.id}
-                  className="camera-photo-thumbnail"
-                  onClick={() => setSelectedPhoto(photo)}
-                >
-                  <img src={photo.dataUrl} alt="Captured" />
-                  <div className="photo-actions">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        downloadPhoto(photo);
-                      }}
-                      title="Download"
-                    >
-                      <Download size={16} />
-                    </button>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        deletePhoto(photo.id);
-                      }}
-                      title="Delete"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
+            {sidebarTab === 'photos' ? (
+              capturedPhotos.length === 0 ? (
+                <div className="no-photos">
+                  <CameraIcon size={32} />
+                  <p>No photos taken yet</p>
                 </div>
-              ))
+              ) : (
+                capturedPhotos.map(photo => (
+                  <div
+                    key={photo.id}
+                    className="camera-photo-thumbnail"
+                    onClick={() => setSelectedPhoto(photo)}
+                  >
+                    <img src={photo.dataUrl} alt="Captured" />
+                    <div className="photo-actions">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          downloadPhoto(photo);
+                        }}
+                        title="Download"
+                      >
+                        <Download size={16} />
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deletePhoto(photo.id);
+                        }}
+                        title="Delete"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )
+            ) : (
+              capturedVideos.length === 0 ? (
+                <div className="no-photos">
+                  <Video size={32} />
+                  <p>No videos recorded yet</p>
+                </div>
+              ) : (
+                capturedVideos.map(video => (
+                  <div
+                    key={video.id}
+                    className="camera-photo-thumbnail video-thumbnail"
+                    onClick={() => setSelectedVideo(video)}
+                  >
+                    <video src={video.dataUrl} />
+                    <div className="video-duration">{formatDuration(video.duration)}</div>
+                    <div className="photo-actions">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          downloadVideo(video);
+                        }}
+                        title="Download"
+                      >
+                        <Download size={16} />
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deleteVideo(video.id);
+                        }}
+                        title="Delete"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )
             )}
           </div>
         </div>
@@ -604,6 +860,33 @@ export const Camera: React.FC = () => {
               </button>
               <button
                 onClick={() => deletePhoto(selectedPhoto.id)}
+                className="delete-button"
+              >
+                <Trash2 size={20} />
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {selectedVideo && (
+        <div className="camera-photo-modal" onClick={() => setSelectedVideo(null)}>
+          <div className="photo-modal-content" onClick={(e) => e.stopPropagation()}>
+            <button
+              className="photo-modal-close"
+              onClick={() => setSelectedVideo(null)}
+            >
+              <X size={24} />
+            </button>
+            <video src={selectedVideo.dataUrl} controls autoPlay />
+            <div className="photo-modal-actions">
+              <button onClick={() => downloadVideo(selectedVideo)}>
+                <Download size={20} />
+                Download
+              </button>
+              <button
+                onClick={() => deleteVideo(selectedVideo.id)}
                 className="delete-button"
               >
                 <Trash2 size={20} />
