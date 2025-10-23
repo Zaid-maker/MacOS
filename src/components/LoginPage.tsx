@@ -82,6 +82,50 @@ export const LoginPage: React.FC = () => {
     }
   };
 
+  const handleCancel = () => {
+    handleBack();
+  };
+
+  const handleSleep = () => {
+    addNotification(
+      'Sleep',
+      'Your Mac is going to sleep...',
+      'info',
+      { appIcon: '💤', duration: 3000 }
+    );
+    setTimeout(() => {
+      // In a real app, this would trigger sleep mode
+      console.log('Sleep mode activated');
+    }, 1000);
+  };
+
+  const handleRestart = () => {
+    addNotification(
+      'Restart',
+      'Your Mac is restarting...',
+      'warning',
+      { appIcon: '🔄', duration: 3000 }
+    );
+    setTimeout(() => {
+      // In a real app, this would trigger restart
+      window.location.reload();
+    }, 2000);
+  };
+
+  const handleShutDown = () => {
+    addNotification(
+      'Shut Down',
+      'Your Mac is shutting down...',
+      'error',
+      { appIcon: '⏻', duration: 3000 }
+    );
+    setTimeout(() => {
+      // In a real app, this would trigger shutdown
+      document.body.style.background = '#000';
+      document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;color:#fff;font-size:24px;">Shutting down...</div>';
+    }, 2000);
+  };
+
   return (
     <div className="login-page">
       <div className="login-wallpaper" />
@@ -144,10 +188,10 @@ export const LoginPage: React.FC = () => {
             </form>
 
             <div className="login-options">
-              <button className="login-option">Cancel</button>
-              <button className="login-option">Sleep</button>
-              <button className="login-option">Restart</button>
-              <button className="login-option">Shut Down</button>
+              <button className="login-option" onClick={handleCancel}>Cancel</button>
+              <button className="login-option" onClick={handleSleep}>Sleep</button>
+              <button className="login-option" onClick={handleRestart}>Restart</button>
+              <button className="login-option" onClick={handleShutDown}>Shut Down</button>
             </div>
           </div>
         )}
