@@ -1,4 +1,4 @@
-import { AlertCircle, ArrowLeft, Moon, RotateCw, Power, Globe, Accessibility } from 'lucide-react';
+import { Accessibility, AlertCircle, ArrowLeft, Globe, Power } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
