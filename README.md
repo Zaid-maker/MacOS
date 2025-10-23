@@ -2,6 +2,38 @@
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
+## Setup
+
+1. **Install dependencies:**
+   ```bash
+   npm install
+   # or
+   bun install
+   ```
+
+2. **Environment Variables:**
+   - Copy `.env.example` to `.env`
+   - Add your OpenWeatherMap API key:
+     ```
+     VITE_OPENWEATHER_API_KEY=your_api_key_here
+     ```
+   - Get a free API key from [OpenWeatherMap](https://openweathermap.org/api)
+
+3. **Run the development server:**
+   ```bash
+   npm run dev
+   # or
+   bun dev
+   ```
+
+## Features
+
+- 🎨 macOS-style UI with glassmorphism effects
+- 📸 Camera app with filters and video recording
+- 🌤️ Weather app with real-time data and geolocation
+- 📝 Notes, Calculator, and more built-in apps
+- 🔐 Authentic macOS login experience
+
 Currently, two official plugins are available:
 
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh

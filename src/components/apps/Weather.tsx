@@ -38,14 +38,18 @@ export const Weather: React.FC = () => {
   const [searchCity, setSearchCity] = useState('');
   const [locationPermission, setLocationPermission] = useState<'prompt' | 'granted' | 'denied' | null>(null);
 
-  // OpenWeatherMap API key - Replace with your own key from https://openweathermap.org/api
-  const API_KEY = 'bd5e378503939ddaee76f12ad7a97608'; // Free tier API key
+  // OpenWeatherMap API key from environment variables
+  const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY;
   const BASE_URL = 'https://api.openweathermap.org/data/2.5';
 
   const fetchWeatherByCoords = async (lat: number, lon: number) => {
     try {
       setLoading(true);
       setError(null);
+
+      if (!API_KEY) {
+        throw new Error('Weather API key not configured. Please add VITE_OPENWEATHER_API_KEY to your .env file');
+      }
 
       // Fetch current weather by coordinates
       const currentResponse = await fetch(
@@ -139,6 +143,10 @@ export const Weather: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
+
+      if (!API_KEY) {
+        throw new Error('Weather API key not configured. Please add VITE_OPENWEATHER_API_KEY to your .env file');
+      }
 
       // Fetch current weather
       const currentResponse = await fetch(
