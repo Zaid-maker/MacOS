@@ -275,18 +275,27 @@ export const Weather: React.FC = () => {
     switch (condition.toLowerCase()) {
       case 'clear':
         return 'linear-gradient(135deg, #4A90E2 0%, #87CEEB 100%)';
-      case 'partly cloudy':
-        return 'linear-gradient(135deg, #6B8FB8 0%, #A9C7E0 100%)';
-      case 'cloudy':
+      case 'clouds':
         return 'linear-gradient(135deg, #5C6B7D 0%, #8B9AAF 100%)';
-      case 'rainy':
+      case 'rain':
+      case 'drizzle':
         return 'linear-gradient(135deg, #4A5568 0%, #718096 100%)';
-      case 'stormy':
+      case 'thunderstorm':
         return 'linear-gradient(135deg, #2D3748 0%, #4A5568 100%)';
-      case 'snowy':
+      case 'snow':
         return 'linear-gradient(135deg, #E2E8F0 0%, #CBD5E0 100%)';
+      case 'mist':
+      case 'smoke':
+      case 'haze':
+      case 'dust':
+      case 'fog':
+      case 'sand':
+      case 'ash':
+      case 'squall':
+      case 'tornado':
+        return 'linear-gradient(135deg, #6B8FB8 0%, #A9C7E0 100%)';
       default:
-        return 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+        return 'linear-gradient(135deg, #4A90E2 0%, #87CEEB 100%)';
     }
   };
 
@@ -294,14 +303,25 @@ export const Weather: React.FC = () => {
     switch (condition.toLowerCase()) {
       case 'clear':
         return <Sun size={size} />;
-      case 'partly cloudy':
+      case 'clouds':
         return <Cloud size={size} />;
-      case 'cloudy':
-        return <Cloud size={size} />;
-      case 'rainy':
+      case 'rain':
+      case 'drizzle':
         return <CloudRain size={size} />;
-      case 'snowy':
+      case 'thunderstorm':
+        return <CloudRain size={size} />;
+      case 'snow':
         return <CloudSnow size={size} />;
+      case 'mist':
+      case 'smoke':
+      case 'haze':
+      case 'dust':
+      case 'fog':
+      case 'sand':
+      case 'ash':
+      case 'squall':
+      case 'tornado':
+        return <Cloud size={size} />;
       default:
         return <Sun size={size} />;
     }
