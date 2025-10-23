@@ -87,13 +87,8 @@ export const LoginPage: React.FC = () => {
   };
 
   const handleSleep = () => {
-    addNotification(
-      'Sleep',
-      'Your Mac is going to sleep...',
-      'info',
-      { appIcon: '🌙', duration: 2000 }
-    );
-    
+    addNotification('Sleep', 'Your Mac is going to sleep...', 'info', { appIcon: '🌙', duration: 2000 });
+
     // Dim the screen and fade out
     setTimeout(() => {
       const overlay = document.createElement('div');
@@ -108,12 +103,12 @@ export const LoginPage: React.FC = () => {
         animation: fadeIn 1s ease-in-out;
       `;
       document.body.appendChild(overlay);
-      
+
       // After fade out, close the tab or show wake message
       setTimeout(() => {
         // Try to close the window (works if opened by script)
         window.close();
-        
+
         // If window.close() doesn't work (most modern browsers), show wake screen
         if (!window.closed) {
           const iconContainer = document.createElement('div');
@@ -122,7 +117,7 @@ export const LoginPage: React.FC = () => {
               <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
             </svg>
           `;
-          
+
           overlay.innerHTML = `
             <div style="
               display: flex;
@@ -140,16 +135,16 @@ export const LoginPage: React.FC = () => {
               <div style="font-size: 16px; opacity: 0.7; margin-bottom: 30px;">Click or press any key to wake</div>
             </div>
           `;
-          
+
           overlay.querySelector('#sleep-icon')?.appendChild(iconContainer.firstElementChild!);
-          
+
           const wake = () => {
             overlay.style.animation = 'fadeOut 0.5s ease-in-out';
             setTimeout(() => {
               document.body.removeChild(overlay);
             }, 500);
           };
-          
+
           overlay.addEventListener('click', wake);
           document.addEventListener('keydown', wake, { once: true });
         }
@@ -158,13 +153,8 @@ export const LoginPage: React.FC = () => {
   };
 
   const handleRestart = () => {
-    addNotification(
-      'Restart',
-      'Your Mac is restarting...',
-      'warning',
-      { appIcon: '↻', duration: 2000 }
-    );
-    
+    addNotification('Restart', 'Your Mac is restarting...', 'warning', { appIcon: '↻', duration: 2000 });
+
     setTimeout(() => {
       // Show restart screen
       const overlay = document.createElement('div');
@@ -181,7 +171,7 @@ export const LoginPage: React.FC = () => {
         justify-content: center;
         animation: fadeIn 0.5s ease-in-out;
       `;
-      
+
       const iconContainer = document.createElement('div');
       iconContainer.innerHTML = `
         <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -189,7 +179,7 @@ export const LoginPage: React.FC = () => {
           <path d="M21 3v5h-5"></path>
         </svg>
       `;
-      
+
       overlay.innerHTML = `
         <div style="
           color: rgba(255,255,255,0.9);
@@ -201,9 +191,9 @@ export const LoginPage: React.FC = () => {
         </div>
       `;
       document.body.appendChild(overlay);
-      
+
       overlay.querySelector('#restart-icon')?.appendChild(iconContainer.firstElementChild!);
-      
+
       // Add spin animation
       const style = document.createElement('style');
       style.textContent = `
@@ -213,7 +203,7 @@ export const LoginPage: React.FC = () => {
         }
       `;
       document.head.appendChild(style);
-      
+
       // Reload the page after animation
       setTimeout(() => {
         window.location.reload();
@@ -222,13 +212,8 @@ export const LoginPage: React.FC = () => {
   };
 
   const handleShutDown = () => {
-    addNotification(
-      'Shut Down',
-      'Your Mac is shutting down...',
-      'error',
-      { appIcon: '⏼', duration: 2000 }
-    );
-    
+    addNotification('Shut Down', 'Your Mac is shutting down...', 'error', { appIcon: '⏼', duration: 2000 });
+
     setTimeout(() => {
       // Show shutdown screen
       const overlay = document.createElement('div');
@@ -245,7 +230,7 @@ export const LoginPage: React.FC = () => {
         justify-content: center;
         animation: fadeIn 0.8s ease-in-out;
       `;
-      
+
       const iconContainer = document.createElement('div');
       iconContainer.innerHTML = `
         <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -253,7 +238,7 @@ export const LoginPage: React.FC = () => {
           <line x1="12" y1="2" x2="12" y2="12"></line>
         </svg>
       `;
-      
+
       overlay.innerHTML = `
         <div style="
           color: rgba(255,255,255,0.9);
@@ -265,19 +250,19 @@ export const LoginPage: React.FC = () => {
         </div>
       `;
       document.body.appendChild(overlay);
-      
+
       overlay.querySelector('#shutdown-icon')?.appendChild(iconContainer.firstElementChild!);
-      
+
       // After shutdown animation, try to close tab or show blank screen
       setTimeout(() => {
         // Try to close the window
         window.close();
-        
+
         // If window.close() doesn't work, show blank screen
         if (!window.closed) {
           overlay.innerHTML = '';
           overlay.style.background = '#000';
-          
+
           // Optional: Add a subtle message with icon
           setTimeout(() => {
             const msgContainer = document.createElement('div');
@@ -288,7 +273,7 @@ export const LoginPage: React.FC = () => {
                 <line x1="12" y1="16" x2="12.01" y2="16"></line>
               </svg>
             `;
-            
+
             overlay.innerHTML = `
               <div style="
                 display: flex;
@@ -306,7 +291,7 @@ export const LoginPage: React.FC = () => {
                 </div>
               </div>
             `;
-            
+
             overlay.querySelector('#info-icon')?.appendChild(msgContainer.firstElementChild!);
           }, 1000);
         }
@@ -376,10 +361,18 @@ export const LoginPage: React.FC = () => {
             </form>
 
             <div className="login-options">
-              <button className="login-option" onClick={handleCancel}>Cancel</button>
-              <button className="login-option" onClick={handleSleep}>Sleep</button>
-              <button className="login-option" onClick={handleRestart}>Restart</button>
-              <button className="login-option" onClick={handleShutDown}>Shut Down</button>
+              <button className="login-option" onClick={handleCancel}>
+                Cancel
+              </button>
+              <button className="login-option" onClick={handleSleep}>
+                Sleep
+              </button>
+              <button className="login-option" onClick={handleRestart}>
+                Restart
+              </button>
+              <button className="login-option" onClick={handleShutDown}>
+                Shut Down
+              </button>
             </div>
           </div>
         )}

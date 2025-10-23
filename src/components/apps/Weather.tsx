@@ -1,4 +1,4 @@
-import { Cloud, CloudRain, CloudSnow, Sun, Wind, Droplets, Eye, Gauge } from 'lucide-react';
+import { Cloud, CloudRain, CloudSnow, Droplets, Eye, Gauge, Sun, Wind } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useState } from 'react';
 
@@ -52,9 +52,7 @@ export const Weather: React.FC = () => {
       }
 
       // Fetch current weather by coordinates
-      const currentResponse = await fetch(
-        `${BASE_URL}/weather?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`
-      );
+      const currentResponse = await fetch(`${BASE_URL}/weather?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`);
 
       if (!currentResponse.ok) {
         throw new Error('Unable to fetch weather for your location');
@@ -63,9 +61,7 @@ export const Weather: React.FC = () => {
       const currentData = await currentResponse.json();
 
       // Fetch forecast by coordinates
-      const forecastResponse = await fetch(
-        `${BASE_URL}/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`
-      );
+      const forecastResponse = await fetch(`${BASE_URL}/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`);
 
       if (!forecastResponse.ok) {
         throw new Error('Unable to fetch forecast');
@@ -88,7 +84,7 @@ export const Weather: React.FC = () => {
       forecastData.list.forEach((item: any) => {
         const date = new Date(item.dt * 1000);
         const dayKey = date.toLocaleDateString('en-US', { weekday: 'long' });
-        
+
         if (!dailyMap.has(dayKey) || dailyMap.size < 7) {
           if (!dailyMap.has(dayKey)) {
             dailyMap.set(dayKey, {
@@ -185,7 +181,7 @@ export const Weather: React.FC = () => {
       forecastData.list.forEach((item: any) => {
         const date = new Date(item.dt * 1000);
         const dayKey = date.toLocaleDateString('en-US', { weekday: 'long' });
-        
+
         if (!dailyMap.has(dayKey) || dailyMap.size < 7) {
           if (!dailyMap.has(dayKey)) {
             dailyMap.set(dayKey, {
@@ -343,11 +339,15 @@ export const Weather: React.FC = () => {
       <div className="weather-app">
         <div className="weather-error">
           <p>{error}</p>
-          <button onClick={() => {
-            setError(null);
-            setLoading(true);
-            fetchWeatherData('San Francisco');
-          }}>Show Default Location</button>
+          <button
+            onClick={() => {
+              setError(null);
+              setLoading(true);
+              fetchWeatherData('San Francisco');
+            }}
+          >
+            Show Default Location
+          </button>
         </div>
       </div>
     );
@@ -356,10 +356,7 @@ export const Weather: React.FC = () => {
   if (!weather) return null;
 
   return (
-    <div 
-      className="weather-app" 
-      style={{ background: getWeatherGradient(weather.condition) }}
-    >
+    <div className="weather-app" style={{ background: getWeatherGradient(weather.condition) }}>
       {/* Search Bar */}
       <div className="weather-search">
         <form onSubmit={handleSearch}>
