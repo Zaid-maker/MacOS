@@ -32,10 +32,12 @@ const Notes = lazy(() => import('./components/apps/Notes').then((m) => ({ defaul
 const Settings = lazy(() => import('./components/apps/Settings').then((m) => ({ default: m.Settings })));
 const Camera = lazy(() => import('./components/apps/Camera').then((m) => ({ default: m.Camera })));
 const Photos = lazy(() => import('./components/apps/Photos').then((m) => ({ default: m.Photos })));
+const Weather = lazy(() => import('./components/apps/Weather').then((m) => ({ default: m.Weather })));
 
 const apps: App[] = [
   { id: 'finder', name: 'Finder', icon: '📁', color: '#54a3ff', component: Finder },
   { id: 'safari', name: 'Safari', icon: '🧭', color: '#0066ff', component: Safari },
+  { id: 'weather', name: 'Weather', icon: '☀️', color: '#4A90E2', component: Weather },
   { id: 'camera', name: 'Camera', icon: '📷', color: '#5e5ce6', component: Camera },
   { id: 'photos', name: 'Photos', icon: '🖼️', color: '#ff2d55', component: Photos },
   { id: 'terminal', name: 'Terminal', icon: '⌨️', color: '#2c2c2c', component: Terminal },
