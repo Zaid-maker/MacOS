@@ -52,10 +52,17 @@ export const OSProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   // Persist running apps whenever they change
   useEffect(() => {
     const runningAppIds = apps.filter((app) => app.isRunning).map((app) => app.id);
-    if (runningAppIds.length > 0) {
+    
+    // Only update if the list actually changed to prevent infinite loops
+    // Also allow empty arrays to clear localStorage when all apps are closed
+    const hasChanged =
+      runningAppIds.length !== persistedRunningApps.length ||
+      runningAppIds.some((id, index) => id !== persistedRunningApps[index]);
+    
+    if (hasChanged) {
       setPersistedRunningApps(runningAppIds);
     }
-  }, [apps, setPersistedRunningApps]);
+  }, [apps, persistedRunningApps, setPersistedRunningApps]);
 
   // Persist window states when they change (debounced through state updates)
   useEffect(() => {
@@ -67,10 +74,29 @@ export const OSProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       return acc;
     }, {} as Record<string, { position: { x: number; y: number }; size: { width: number; height: number } }>);
     
-    if (Object.keys(windowStates).length > 0) {
+    // Only update if the states actually changed to prevent infinite loops
+    const stateKeys = Object.keys(windowStates).sort();
+    const persistedKeys = Object.keys(persistedWindowStates).sort();
+    
+    const hasChanged =
+      stateKeys.length !== persistedKeys.length ||
+      stateKeys.some((key, index) => key !== persistedKeys[index]) ||
+      stateKeys.some((key) => {
+        const current = windowStates[key];
+        const persisted = persistedWindowStates[key];
+        return (
+          !persisted ||
+          current.position.x !== persisted.position.x ||
+          current.position.y !== persisted.position.y ||
+          current.size.width !== persisted.size.width ||
+          current.size.height !== persisted.size.height
+        );
+      });
+    
+    if (hasChanged) {
       setPersistedWindowStates(windowStates);
     }
-  }, [windows, setPersistedWindowStates]);
+  }, [windows, persistedWindowStates, setPersistedWindowStates]);
 
   const openApp = useCallback(
     (appId: string) => {

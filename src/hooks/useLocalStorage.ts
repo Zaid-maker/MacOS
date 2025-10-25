@@ -24,18 +24,22 @@ export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T 
   const setValue = useCallback(
     (value: T | ((prev: T) => T)) => {
       try {
-        // Allow value to be a function so we have same API as useState
-        const valueToStore = value instanceof Function ? value(storedValue) : value;
-        setStoredValue(valueToStore);
-        
-        if (typeof window !== 'undefined') {
-          window.localStorage.setItem(key, JSON.stringify(valueToStore));
-        }
+        // Use functional update to ensure we always get the latest state
+        // This guarantees consecutive functional updates work correctly
+        setStoredValue((currentValue) => {
+          const valueToStore = value instanceof Function ? value(currentValue) : value;
+          
+          if (typeof window !== 'undefined') {
+            window.localStorage.setItem(key, JSON.stringify(valueToStore));
+          }
+          
+          return valueToStore;
+        });
       } catch (error) {
         console.warn(`Error saving localStorage key "${key}":`, error);
       }
     },
-    [key, storedValue]
+    [key]
   );
 
   return [storedValue, setValue];
