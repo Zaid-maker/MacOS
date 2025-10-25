@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { BootAnimation } from './components/BootAnimation';
 import { ControlCenter } from './components/ControlCenter';
 import { Desktop } from './components/Desktop';
@@ -34,6 +34,7 @@ const Camera = lazy(() => import('./components/apps/Camera').then((m) => ({ defa
 const Photos = lazy(() => import('./components/apps/Photos').then((m) => ({ default: m.Photos })));
 const Weather = lazy(() => import('./components/apps/Weather').then((m) => ({ default: m.Weather })));
 
+// Memoize apps array to prevent unnecessary re-renders
 const apps: App[] = [
   { id: 'finder', name: 'Finder', icon: '📁', color: '#54a3ff', component: Finder },
   { id: 'safari', name: 'Safari', icon: '🧭', color: '#0066ff', component: Safari },
@@ -46,6 +47,7 @@ const apps: App[] = [
   { id: 'settings', name: 'Settings', icon: '⚙️', color: '#8e8e93', component: Settings },
 ];
 
+// Memoize desktop icons to prevent unnecessary re-renders
 const desktopIcons: DesktopIcon[] = [
   { id: 'desktop-1', name: 'Documents', icon: '📄', position: { x: 20, y: 50 }, appId: 'finder' },
   { id: 'desktop-2', name: 'Pictures', icon: '🖼️', position: { x: 20, y: 150 }, appId: 'finder' },
@@ -70,6 +72,23 @@ function OSContent() {
     setApps(apps);
   }, [setApps]);
 
+  // Memoize window rendering to prevent unnecessary re-renders
+  const renderedWindows = useMemo(
+    () =>
+      windows.map((window) => {
+        const app = contextApps.find((a) => a.id === window.appId);
+        const AppComponent = app?.component;
+        return (
+          <Window key={window.id} window={window}>
+            <Suspense fallback={<div className="app-loading">Loading...</div>}>
+              {AppComponent && <AppComponent />}
+            </Suspense>
+          </Window>
+        );
+      }),
+    [windows, contextApps]
+  );
+
   if (!isAuthenticated) {
     return <LoginPage />;
   }
@@ -81,17 +100,7 @@ function OSContent() {
         onControlCenterToggle={() => setIsControlCenterOpen(!isControlCenterOpen)}
       />
       <Desktop icons={desktopIcons} />
-      {windows.map((window) => {
-        const app = contextApps.find((a) => a.id === window.appId);
-        const AppComponent = app?.component;
-        return (
-          <Window key={window.id} window={window}>
-            <Suspense fallback={<div className="app-loading">Loading...</div>}>
-              {AppComponent && <AppComponent />}
-            </Suspense>
-          </Window>
-        );
-      })}
+      {renderedWindows}
       <Dock apps={contextApps} />
       <Spotlight isOpen={isSpotlightOpen} onClose={() => setIsSpotlightOpen(false)} />
       <ControlCenter isOpen={isControlCenterOpen} onClose={() => setIsControlCenterOpen(false)} />

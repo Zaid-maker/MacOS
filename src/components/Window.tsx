@@ -18,12 +18,23 @@ export const Window: React.FC<WindowProps> = React.memo(({ window, children }) =
   const [hasControlFocus, setHasControlFocus] = useState(false);
   const animationFrameRef = useRef<number | undefined>(undefined);
 
+  // Cleanup animation frame on unmount
+  useEffect(() => {
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, []);
+
   const handleMouseMove = useCallback(
     (e: MouseEvent) => {
+      // Cancel any pending animation frame
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
 
+      // Use requestAnimationFrame for smooth 60fps updates
       animationFrameRef.current = requestAnimationFrame(() => {
         if (isDragging) {
           const newX = e.clientX - dragOffset.x;
@@ -36,7 +47,7 @@ export const Window: React.FC<WindowProps> = React.memo(({ window, children }) =
           const newHeight = Math.max(300, resizeStart.height + deltaY);
           updateWindowSize(window.id, { width: newWidth, height: newHeight });
         }
-      });
+      }) as number;
     },
     [isDragging, isResizing, dragOffset, resizeStart, window.id, updateWindowPosition, updateWindowSize]
   );
@@ -86,6 +97,27 @@ export const Window: React.FC<WindowProps> = React.memo(({ window, children }) =
     });
   };
 
+  const handleWindowClick = useCallback(() => {
+    if (!window.isFocused) {
+      focusWindow(window.id);
+    }
+  }, [window.isFocused, window.id, focusWindow]);
+
+  const handleCloseClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    closeWindow(window.id);
+  }, [window.id, closeWindow]);
+
+  const handleMinimizeClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    minimizeWindow(window.id);
+  }, [window.id, minimizeWindow]);
+
+  const handleMaximizeClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    maximizeWindow(window.id);
+  }, [window.id, maximizeWindow]);
+
   if (window.isMinimized) return null;
 
   const style: React.CSSProperties = window.isMaximized
@@ -109,7 +141,7 @@ export const Window: React.FC<WindowProps> = React.memo(({ window, children }) =
       ref={windowRef}
       className={`window ${window.isFocused ? 'focused' : ''}`}
       style={style}
-      onClick={() => focusWindow(window.id)}
+      onClick={handleWindowClick}
       onMouseEnter={() => setShowControlIcons(true)}
       onMouseLeave={() => setShowControlIcons(false)}
       onTouchStart={() => setShowControlIcons(true)}
@@ -118,10 +150,7 @@ export const Window: React.FC<WindowProps> = React.memo(({ window, children }) =
         <div className="window-controls">
           <button
             className="window-control close"
-            onClick={(e) => {
-              e.stopPropagation();
-              closeWindow(window.id);
-            }}
+            onClick={handleCloseClick}
             onFocus={() => setHasControlFocus(true)}
             onBlur={() => setHasControlFocus(false)}
             title="Close"
@@ -130,10 +159,7 @@ export const Window: React.FC<WindowProps> = React.memo(({ window, children }) =
           </button>
           <button
             className="window-control minimize"
-            onClick={(e) => {
-              e.stopPropagation();
-              minimizeWindow(window.id);
-            }}
+            onClick={handleMinimizeClick}
             onFocus={() => setHasControlFocus(true)}
             onBlur={() => setHasControlFocus(false)}
             title="Minimize"
@@ -142,10 +168,7 @@ export const Window: React.FC<WindowProps> = React.memo(({ window, children }) =
           </button>
           <button
             className="window-control maximize"
-            onClick={(e) => {
-              e.stopPropagation();
-              maximizeWindow(window.id);
-            }}
+            onClick={handleMaximizeClick}
             onFocus={() => setHasControlFocus(true)}
             onBlur={() => setHasControlFocus(false)}
             title="Maximize"
