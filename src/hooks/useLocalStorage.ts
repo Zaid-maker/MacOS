@@ -53,13 +53,11 @@ export function useDebouncedLocalStorage<T>(
   initialValue: T,
   delay = 500
 ): [T, (value: T | ((prev: T) => T)) => void] {
-  const [value, setInternalValue] = useState<T>(initialValue);
   const [storedValue, setStoredValue] = useLocalStorage(key, initialValue);
-
-  // Initialize from localStorage
-  useEffect(() => {
-    setInternalValue(storedValue);
-  }, []); // Only run once on mount
+  
+  // Initialize from the persisted value so the restored state is available on the initial render
+  // This prevents a flash of default values before showing the saved state
+  const [value, setInternalValue] = useState<T>(storedValue);
 
   // Debounce writes to localStorage
   useEffect(() => {
