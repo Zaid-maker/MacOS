@@ -1,6 +1,7 @@
 import type React from 'react';
-import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { App, AppWindow } from '../types';
+import { useLocalStorage } from '../hooks/useLocalStorage';
 import { useSound } from './SoundContext';
 
 interface OSContextType {
@@ -25,6 +26,77 @@ export const OSProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   const [apps, setApps] = useState<App[]>([]);
   const [activeApp, setActiveApp] = useState<string | null>(null);
   const [nextZIndex, setNextZIndex] = useState(100);
+  
+  // Persist window positions and sizes to localStorage
+  const [persistedWindowStates, setPersistedWindowStates] = useLocalStorage<
+    Record<string, { position: { x: number; y: number }; size: { width: number; height: number } }>
+  >('macos-window-states', {});
+
+  // Persist running apps to localStorage
+  const [persistedRunningApps, setPersistedRunningApps] = useLocalStorage<string[]>('macos-running-apps', []);
+
+  // Restore window states when opening apps
+  useEffect(() => {
+    // Restore running apps on mount
+    if (persistedRunningApps.length > 0 && apps.length > 0) {
+      persistedRunningApps.forEach((appId) => {
+        const app = apps.find((a) => a.id === appId);
+        if (app && !windows.some((w) => w.appId === appId)) {
+          // Restore the app (but don't auto-open, just mark as running)
+          setApps((prev) => prev.map((a) => (a.id === appId ? { ...a, isRunning: true } : a)));
+        }
+      });
+    }
+  }, [apps.length]); // Only run when apps are loaded
+
+  // Persist running apps whenever they change
+  useEffect(() => {
+    const runningAppIds = apps.filter((app) => app.isRunning).map((app) => app.id);
+    
+    // Only update if the list actually changed to prevent infinite loops
+    // Also allow empty arrays to clear localStorage when all apps are closed
+    const hasChanged =
+      runningAppIds.length !== persistedRunningApps.length ||
+      runningAppIds.some((id, index) => id !== persistedRunningApps[index]);
+    
+    if (hasChanged) {
+      setPersistedRunningApps(runningAppIds);
+    }
+  }, [apps, persistedRunningApps, setPersistedRunningApps]);
+
+  // Persist window states when they change (debounced through state updates)
+  useEffect(() => {
+    const windowStates = windows.reduce((acc, window) => {
+      acc[window.appId] = {
+        position: window.position,
+        size: window.size,
+      };
+      return acc;
+    }, {} as Record<string, { position: { x: number; y: number }; size: { width: number; height: number } }>);
+    
+    // Only update if the states actually changed to prevent infinite loops
+    const stateKeys = Object.keys(windowStates).sort();
+    const persistedKeys = Object.keys(persistedWindowStates).sort();
+    
+    const hasChanged =
+      stateKeys.length !== persistedKeys.length ||
+      stateKeys.some((key, index) => key !== persistedKeys[index]) ||
+      stateKeys.some((key) => {
+        const current = windowStates[key];
+        const persisted = persistedWindowStates[key];
+        return (
+          !persisted ||
+          current.position.x !== persisted.position.x ||
+          current.position.y !== persisted.position.y ||
+          current.size.width !== persisted.size.width ||
+          current.size.height !== persisted.size.height
+        );
+      });
+    
+    if (hasChanged) {
+      setPersistedWindowStates(windowStates);
+    }
+  }, [windows, persistedWindowStates, setPersistedWindowStates]);
 
   const openApp = useCallback(
     (appId: string) => {
@@ -53,6 +125,11 @@ export const OSProvider: React.FC<{ children: React.ReactNode }> = ({ children }
         return;
       }
 
+      // Use persisted state if available, otherwise use defaults
+      const persistedState = persistedWindowStates[appId];
+      const defaultPosition = { x: 100 + windows.length * 30, y: 100 + windows.length * 30 };
+      const defaultSize = { width: 800, height: 600 };
+
       const newWindow: AppWindow = {
         id: `${appId}-${Date.now()}`,
         appId,
@@ -60,8 +137,8 @@ export const OSProvider: React.FC<{ children: React.ReactNode }> = ({ children }
         isMinimized: false,
         isMaximized: false,
         isFocused: true,
-        position: { x: 100 + windows.length * 30, y: 100 + windows.length * 30 },
-        size: { width: 800, height: 600 },
+        position: persistedState?.position || defaultPosition,
+        size: persistedState?.size || defaultSize,
         zIndex: nextZIndex,
       };
 
@@ -71,7 +148,7 @@ export const OSProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       setNextZIndex((prev) => prev + 1);
       playSound('open');
     },
-    [apps, windows, nextZIndex, playSound]
+    [apps, windows, nextZIndex, playSound, persistedWindowStates]
   );
 
   const closeWindow = useCallback(
@@ -108,18 +185,18 @@ export const OSProvider: React.FC<{ children: React.ReactNode }> = ({ children }
 
   const focusWindow = useCallback(
     (windowId: string) => {
-      setWindows((prev) =>
-        prev.map((w) =>
+      setWindows((prev) => {
+        const window = prev.find((w) => w.id === windowId);
+        if (window) {
+          setActiveApp(window.appId);
+        }
+        return prev.map((w) =>
           w.id === windowId ? { ...w, isFocused: true, zIndex: nextZIndex } : { ...w, isFocused: false }
-        )
-      );
-      const window = windows.find((w) => w.id === windowId);
-      if (window) {
-        setActiveApp(window.appId);
-      }
+        );
+      });
       setNextZIndex((prev) => prev + 1);
     },
-    [windows, nextZIndex]
+    [nextZIndex]
   );
 
   const updateWindowPosition = useCallback((windowId: string, position: { x: number; y: number }) => {
